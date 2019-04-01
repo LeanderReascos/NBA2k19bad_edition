@@ -21,7 +21,6 @@ void printMenu(char filename[], int n){
 }
 
 int mainSelect(){
-	printf("ENTRO\n");
 	char cTecla;
 	int ln = nLines;
 	int aux = 1;
