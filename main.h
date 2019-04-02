@@ -27,7 +27,7 @@ int mainSelect(){
     while(1){
        	if(aux){
               	 aux = 0;
-             	 printMenu("main.txt",ln);
+             	 printMenu("Ficheiros_de_texto/main.txt",ln);
               }
               	cTecla = getch();
        		if(cTecla == 0){
