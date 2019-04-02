@@ -13,6 +13,8 @@ typedef struct campoDeJuego
 	//dimenções em carateres do campo (vem do ficheiro)
 	int aChar;
 	int lChar;
+	//gravidade
+	float g;
 }CAMPO;
 
 void addJugador(float x, float y, char n, CAMPO *campo){
