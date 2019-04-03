@@ -1,3 +1,4 @@
+#include "campoDeJogo.h"
 
 typedef struct partida{
 	int njogadores;
@@ -26,11 +27,11 @@ partidanova->campo.aChar=50;
 strcpy(partidanova->campo.file,"campo");
 
 	
-printf ("How many players will play this round?");
+printf ("How many players will play this round? ");
 scanf("%d",&(partidanova->njogadores));
 
 FILE* fp;
-fp=fopen("planets.data","r");
+fp=fopen("Base_de_datos/planets.data","r");
 if(fp==NULL){
 	printf("ERROR\n");
 	exit(-1);
@@ -58,5 +59,3 @@ strcpy(partidanova->campo.file,"campo");
 readCampo( &(partidanova->campo));
 
 }
-
-
