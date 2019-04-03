@@ -8,7 +8,7 @@
 int main(int argc, char const *argv[])
 {
 	int op,x;
-	PARTIDA *partida;
+	PARTIDA *partida = (PARTIDA*) malloc(sizeof(PARTIDA)); 
 	do{
 		op = mainSelect("Ficheiros_de_texto/main");
 		switch(op){
@@ -16,6 +16,9 @@ int main(int argc, char const *argv[])
 				break;
 			case 2:
 				x = mainSelect("Ficheiros_de_texto/planets");
+				system("cls");
+				printHeader();
+				printf("\n\n\n");
 				NEWGAME(partida,x);
 
 				break;
@@ -26,6 +29,7 @@ int main(int argc, char const *argv[])
 				break;
 			case 4:
 			case 0:
+				freeMemoryPartida(partida);
 				break;
 		}	
 		

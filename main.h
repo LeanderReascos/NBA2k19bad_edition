@@ -1,6 +1,14 @@
 #include <string.h>
 #include <conio.h>
 
+void freeMemoryMain(char **main, int n){
+  int i;
+  for(i=0; i<n;i++){
+    free(main[i]);
+  }
+  free(main);
+}
+
 void printHeader(){
   FILE *fp;
   fp = fopen("Ficheiros_de_texto/header","r");
@@ -68,6 +76,7 @@ int mainSelect(char fileMenu[]){
     switch(cTecla)
     {
       case 13://ENTER
+        freeMemoryMain(menu,i);
         return opcion+1;
         break;
       

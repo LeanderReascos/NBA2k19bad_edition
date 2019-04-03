@@ -4,7 +4,7 @@
 typedef struct campoDeJuego
 {
 	char nome[8];
-	char file[5]; //nome do ficheiro
+	char file[100]; //nome do ficheiro
 	//Matriz de carateres do campo de jogo
 	char **campoDeJuego;
 	int lin;
@@ -32,7 +32,7 @@ void freeCampo(CAMPO *campo){
 void printCampo(CAMPO *campo){
 	system("cls");
 	int i;
-	printf("%d\n", campo->lin);
+	printf("\t\t\t%s\n",campo->nome );
 	for(i=0;i<campo->lin;i++){
 		printf("%s",campo->campoDeJuego[i]);
 	}
@@ -41,21 +41,30 @@ void printCampo(CAMPO *campo){
 void readCampo(CAMPO *campo){
 	FILE *fp;
 	fp = fopen(campo->file,"r");
-	if(fp==NULL) exit(-1);
+	if(fp==NULL){
+		printf("Error memoria 0\n");
+		exit(-1);
+	}
 	int i=0;
 	char buffer[219];
 	campo->campoDeJuego = (char **) malloc(sizeof(char *));
-	if(campo->campoDeJuego == NULL)
+	if(campo->campoDeJuego == NULL){
+		printf("Error memoria 1\n");
 		exit(-1);
+	}
 	while(fgets(buffer,sizeof(buffer),fp)){
 		if(i >  0){
 			campo->campoDeJuego = (char **) realloc(campo->campoDeJuego,(i+1)*sizeof(char *));
-			if(campo->campoDeJuego == NULL) 
+			if(campo->campoDeJuego == NULL) {
+				printf("Error memoria 2\n");
 				exit(-1);
+			}
 		}
 		campo->campoDeJuego[i] = (char *) malloc(strlen(buffer)*sizeof(char));
-		if(campo->campoDeJuego == NULL)
+		if(campo->campoDeJuego == NULL){
+			printf("Error memoria 3\n");
 			exit(-1);
+		}
 		strcpy(campo->campoDeJuego[i],buffer);
 		i++;
 	}
