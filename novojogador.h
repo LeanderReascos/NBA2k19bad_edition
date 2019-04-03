@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdio.h>
 
 void novoJogador(){
     char nome[100];
@@ -15,10 +17,10 @@ void novoJogador(){
 	for (i=1;i<=n;i++){
 	 printf ("\n");
      printf ("What's your player name? \n 	"); 
-     scanf ("%s",&nome);
+     scanf (" %[^\n]%*c", nome);
      printf("What's your heigh? \n 	");
  	 scanf ("%f",&altura);
-     fprintf(fp,"%s;%.2f; \n", nome,altura); 
+     fprintf(fp,"%s;%.2f", nome,altura); 
     }
 
 	fclose(fp);
