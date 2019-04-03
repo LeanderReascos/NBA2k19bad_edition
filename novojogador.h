@@ -20,7 +20,7 @@ void novoJogador(){
      scanf (" %[^\n]%*c", nome);
      printf("What's your heigh? \n 	");
  	 scanf ("%f",&altura);
-     fprintf(fp,"%s;%.2f", nome,altura); 
+     fprintf(fp,"%s;%.2f\n", nome,altura); 
     }
 
 	fclose(fp);
