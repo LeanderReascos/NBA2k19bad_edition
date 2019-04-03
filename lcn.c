@@ -3,37 +3,32 @@
 #include "main.h"
 #include "campoDeJogo.h"
 #include "launch.h"
+#include "novojogador.h"
 
 int main(int argc, char const *argv[])
 {
-	int op;
-	CAMPO campo;
-	BOLA bola;
-	bola.h0 = 1;  // Pos em y inicinal
-	bola.v = 11.5; // Velocidade inicial
-	bola.ang = 45*3.14/180; //angulo de lanzamiento
-	bola.distCesto = 11;
-
-	op = mainSelect();
-	switch(op){
-		case 1:
-			/*strcpy(campo.file , "campo");
-			campo.ancho = 11;
-			campo.largo =15;
-			campo.aChar =50;
-			campo.lChar =128;
-			readCampo(&campo);
-			addJugador(7.5,6,'1',&campo);
-			printCampo(&campo);*/
-			parabola(&bola);
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		case 0:
-			break;
+	int op,x;
+	do{
+		op = mainSelect("Ficheiros_de_texto/main");
+		switch(op){
+			case 1:
+				break;
+			case 2:
+				x = mainSelect("Ficheiros_de_texto/planets");
+				break;
+			case 3:
+				system("cls");
+				printHeader();
+				novoJogador();
+				break;
+			case 4:
+			case 0:
+				break;
+		}	
+		
 	}
-	//freeCampo(&campo);
+	while(op != 0 && op!=4 );
+	
 	return 0;
 }
+

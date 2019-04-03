@@ -3,6 +3,7 @@
 
 typedef struct campoDeJuego
 {
+	char nome[8];
 	char file[5]; //nome do ficheiro
 	//Matriz de carateres do campo de jogo
 	char **campoDeJuego;
