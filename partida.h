@@ -1,8 +1,21 @@
-#include "campoDeJogo.h"
 #include <string.h>
+#include "campoDeJogo.h"
+#include "launch.h"
+
+typedef struct jogador{
+	//Base de datos
+	char *name;
+	float altura;
+	//posição
+	float posX;
+	float posY;
+	//Launch
+	BOLA bola;
+}PLAYER;
 
 typedef struct partida{
 	int njogadores;
+	PLAYER *players;
 	CAMPO  campo;
 	
 }PARTIDA;
@@ -16,7 +29,43 @@ typedef struct planeta{
 	
 }PLANETA;
 
+void printPlayer(PLAYER *player){
+	printf("%s\n%f",player->name,player->altura );
+}
+
+
+void readPlayer(PLAYER *player,int n){
+	int i = 0,j;
+	FILE *fp;
+	fp = fopen("Base_de_datos/Jogadores.data","r");
+	if(fp == NULL){
+		printf("Error ler jogador\n");
+		exit(-1);
+	}
+	j = 0;
+	char buffer[100];
+	char *token;
+	while(fgets(buffer,sizeof(buffer),fp) && i!=n){
+		if(i==n-1){
+			token = strtok(buffer,"-");
+			while(token != NULL){
+				if(j==0){
+					player->name = (char *) malloc(strlen(token)*sizeof(char));
+					strcpy(player->name,token);
+				}
+				else if(j==1)
+					player->altura = atof(token);
+				j++;
+				token = strtok(NULL, "-");
+			}
+		}
+		i++;
+	}
+
+}
+
 void freeMemoryPartida(PARTIDA *partida){
+	free(partida->players);
 	free(partida);
 }
 
@@ -34,7 +83,9 @@ void NEWGAME(PARTIDA *partidanova ,int opcao){
 	int nJugadores;
 	scanf("%d",&nJugadores);
 	partidanova->njogadores = nJugadores;
-	printf("FUNCIONA HASTA AQUI\n");
+
+	partidanova->players = (PLAYER *) malloc(partidanova->njogadores*sizeof(PLAYER));
+
 	FILE* fp;
 	fp=fopen("Base_de_datos/planets.data","r");
 	if(fp==NULL){
