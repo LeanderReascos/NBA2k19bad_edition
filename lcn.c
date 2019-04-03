@@ -2,8 +2,16 @@
 #include <stdlib.h>
 #include "main.h"
 #include "partida.h"
-#include "launch.h"
 #include "novojogador.h"
+
+void adicionarjugadores(PARTIDA *partida){
+	int i,x;
+	for(i=0; i<partida->njogadores; i++){
+		x = mainSelect("Base_de_datos/Jogadores.data");
+		readPlayer(&partida->players[i],x);
+		printPlayer(&partida->players[i]);
+	}
+}
 
 int main(int argc, char const *argv[])
 {
@@ -20,7 +28,7 @@ int main(int argc, char const *argv[])
 				printHeader();
 				printf("\n\n\n");
 				NEWGAME(partida,x);
-
+				adicionarjugadores(partida);
 				break;
 			case 3:
 				system("cls");
@@ -29,7 +37,8 @@ int main(int argc, char const *argv[])
 				break;
 			case 4:
 			case 0:
-				freeMemoryPartida(partida);
+				if(partida != NULL)
+					freeMemoryPartida(partida);
 				break;
 		}	
 		

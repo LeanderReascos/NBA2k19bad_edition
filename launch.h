@@ -2,7 +2,7 @@
 #include <string.h>
 #include <time.h>
 
-#define g 9.81
+//#define g 9.81
 #define hCesto 3.05
 #define carateresPorMetro 5
 #define radioCesto 0.45
@@ -21,7 +21,7 @@ typedef struct bola{
 	float distCesto;
 }BOLA;
 
-void launch_time(BOLA *bola, float t){
+/*void launch_time(BOLA *bola, float t){
 	bola->x = bola->v*cos(bola->ang)*t;
 	bola->y = bola->h0 + bola->v*sin(bola->ang)*t -(float)( 0.5*g*pow(t,2));
 	//printf("%f %f %f\n",bola->x,bola->y,t);
@@ -86,4 +86,4 @@ void parabola(BOLA *bola){
 
 	 free(bola->parabola);
 
-}
+}*/
