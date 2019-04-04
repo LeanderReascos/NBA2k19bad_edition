@@ -11,9 +11,13 @@ typedef struct jogador{
 	float posY;
 	//Launch
 	BOLA bola;
+	//Rondas
+	int numeroRondas;
+	int *pontosRondas;
 }PLAYER;
 
 typedef struct partida{
+	int modoDeJogo;
 	int njogadores;
 	PLAYER *players;
 	CAMPO  campo;
@@ -62,11 +66,17 @@ void readPlayer(PLAYER *player,int n){
 		i++;
 	}
 
+
+}
+
+void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
+
 }
 
 void freeMemoryPartida(PARTIDA *partida){
 	free(partida->players);
 	free(partida);
+	freeCampo(partida->campo);
 }
 
 void NEWGAME(PARTIDA *partidanova ,int opcao){
@@ -114,5 +124,5 @@ void NEWGAME(PARTIDA *partidanova ,int opcao){
 
 	CAMPO *c = &partidanova->campo;
 	readCampo(c);
-	freeCampo(c);
+
 }
