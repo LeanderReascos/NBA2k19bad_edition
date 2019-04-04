@@ -8,8 +8,10 @@ void adicionarjugadores(PARTIDA *partida){
 	int i,x;
 	for(i=0; i<partida->njogadores; i++){
 		x = mainSelect("Base_de_datos/Jogadores.data");
-		readPlayer(&partida->players[i],x);
-		printPlayer(&partida->players[i]);
+		if(x != 0){
+			readPlayer(&partida->players[i],x);
+			printPlayer(&partida->players[i]);	
+		}
 	}
 }
 
@@ -37,7 +39,7 @@ int main(int argc, char const *argv[])
 				break;
 			case 4:
 			case 0:
-				if(partida != NULL)
+				if(partida == NULL)
 					freeMemoryPartida(partida);
 				break;
 		}	
