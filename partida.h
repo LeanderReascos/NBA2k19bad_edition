@@ -34,7 +34,35 @@ typedef struct planeta{
 }PLANETA;
 
 void printPlayer(PLAYER *player){
-	printf("%s\n%f",player->name,player->altura );
+	printf("\t%s\n\t%f\n",player->name,player->altura);
+	int i;
+	for(i=0; i<player->numeroRondas;i++){
+		printf("\t\tROUND %d: %d",i+1,player->pontosRondas[i]);
+	}
+}
+
+void printPartida(PARTIDA *partida){
+	system("cls");
+	printf("\n\n\t\t\t*** %s ***\n\n\n",partida->campo.nome);
+	printCampo(&partida->campo);
+	printf("\n\n>>> ");
+	switch(partida->modoDeJogo){
+		case 1:
+				printf("CASUAL\n");
+				break;
+		case 2:
+				printf("COMPETITIVE\n");
+				break;
+		case 3:
+				printf("SUDDEN DEATH\n");
+				break;
+	}
+	int i;
+	for(i=0; i<partida->njogadores;i++){
+		printf("\n%d. \n",i+1);;
+		printPlayer(&partida->players[i]);
+	}
+
 }
 
 
@@ -70,13 +98,48 @@ void readPlayer(PLAYER *player,int n){
 }
 
 void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
+	int i,j;
+	partida->modoDeJogo=modoDeJogo;
+	
+	switch(modoDeJogo){
+		case (1):
+			for(i=0;i<partida->njogadores;i++){
+				partida->players[i].numeroRondas=5;
+				partida->players[i].pontosRondas=(int*) malloc(5*sizeof(int));
 
+				for(j=0; j<partida->players[i].numeroRondas;j++){
+					partida->players[i].pontosRondas[j] = 0;
+				}
+			}
+			break;
+		case(2):
+			for(i=0;i<partida->njogadores;i++){
+				partida->players[i].numeroRondas=5;
+				partida->players[i].pontosRondas=(int*) malloc(5*sizeof(int));
+
+				for(j=0; j<partida->players[i].numeroRondas;j++){
+					partida->players[i].pontosRondas[j] = 0;
+				}
+			}
+			break;
+		case(3):
+			for(i=0;i<partida->njogadores;i++){
+				partida->players[i].numeroRondas=1;
+				partida->players[i].pontosRondas=(int*) malloc(sizeof(int));
+
+				for(j=0; j<partida->players[i].numeroRondas;j++){
+					partida->players[i].pontosRondas[j] = 0;
+				}
+			}
+			break;
+	}
+	
 }
 
 void freeMemoryPartida(PARTIDA *partida){
 	free(partida->players);
 	free(partida);
-	freeCampo(partida->campo);
+	freeCampo(&partida->campo);
 }
 
 void NEWGAME(PARTIDA *partidanova ,int opcao){

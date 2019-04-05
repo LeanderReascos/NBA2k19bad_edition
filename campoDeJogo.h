@@ -30,9 +30,7 @@ void freeCampo(CAMPO *campo){
 }
 
 void printCampo(CAMPO *campo){
-	system("cls");
 	int i;
-	printf("\t\t\t%s\n",campo->nome );
 	for(i=0;i<campo->lin;i++){
 		printf("%s",campo->campoDeJuego[i]);
 	}

@@ -3,14 +3,13 @@
 #include "main.h"
 #include "partida.h"
 #include "novojogador.h"
-
+#include "valoresLaunch.h"
 void adicionarjugadores(PARTIDA *partida){
 	int i,x;
 	for(i=0; i<partida->njogadores; i++){
 		x = mainSelect("Base_de_datos/Jogadores.data");
 		if(x != 0){
 			readPlayer(&partida->players[i],x);
-			printPlayer(&partida->players[i]);	
 		}
 	}
 }
@@ -31,7 +30,18 @@ int main(int argc, char const *argv[])
 				printf("\n\n\n");
 				NEWGAME(partida,x);
 				adicionarjugadores(partida);
+				if(partida->njogadores > 1)
+					x = mainSelect("Ficheiros_de_texto/mode");
+				else
+					x = 1;
+				seleccionarModoDeJogo(partida,x);
+				printPartida(partida);
+				system("pause");
+				//system("cls");
+				//velocidadeSalto(1.80);
+
 				break;
+
 			case 3:
 				system("cls");
 				printHeader();
