@@ -3,7 +3,7 @@
 #include "main.h"
 #include "partida.h"
 #include "novojogador.h"
-#include "valoresLaunch.h"
+
 void adicionarjugadores(PARTIDA *partida){
 	int i,x;
 	for(i=0; i<partida->njogadores; i++){
@@ -36,10 +36,9 @@ int main(int argc, char const *argv[])
 					x = 1;
 				seleccionarModoDeJogo(partida,x);
 				printPartida(partida);
+				printf("\n");
 				system("pause");
-				//system("cls");
-				//velocidadeSalto(1.80);
-
+				playGame(partida);
 				break;
 
 			case 3:
