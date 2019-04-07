@@ -1,6 +1,8 @@
 #include <string.h>
 #include "campoDeJogo.h"
 #include "launch.h"
+#include "valoresLaunch.h"
+#include <math.h>
 
 typedef struct jogador{
 	//Base de datos
@@ -19,6 +21,7 @@ typedef struct jogador{
 typedef struct partida{
 	int modoDeJogo;
 	int njogadores;
+	int nRondas;
 	PLAYER *players;
 	CAMPO  campo;
 	
@@ -105,6 +108,7 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 		case (1):
 			for(i=0;i<partida->njogadores;i++){
 				partida->players[i].numeroRondas=5;
+				partida->nRondas = 5;
 				partida->players[i].pontosRondas=(int*) malloc(5*sizeof(int));
 
 				for(j=0; j<partida->players[i].numeroRondas;j++){
@@ -115,6 +119,7 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 		case(2):
 			for(i=0;i<partida->njogadores;i++){
 				partida->players[i].numeroRondas=5;
+				partida->nRondas = 5;
 				partida->players[i].pontosRondas=(int*) malloc(5*sizeof(int));
 
 				for(j=0; j<partida->players[i].numeroRondas;j++){
@@ -125,6 +130,7 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 		case(3):
 			for(i=0;i<partida->njogadores;i++){
 				partida->players[i].numeroRondas=1;
+				partida->nRondas = 1;
 				partida->players[i].pontosRondas=(int*) malloc(sizeof(int));
 
 				for(j=0; j<partida->players[i].numeroRondas;j++){
@@ -188,4 +194,29 @@ void NEWGAME(PARTIDA *partidanova ,int opcao){
 	CAMPO *c = &partidanova->campo;
 	readCampo(c);
 
+}
+
+void playGame(PARTIDA *partida){
+	int i,j;
+	for(i=0; i<partida->nRondas; i++){
+		for(j=0; j<partida->njogadores;j++){
+			system("cls");
+			printPlayer(&partida->players[j]);
+			printf("\n\nRONDA %d",i+1);
+			printf("\n");
+			system("pause");
+			system("cls");
+			printf("Jump Velocity: 0.00\n");
+			float v = velocidadeSalto(partida->players[j].altura,partida->campo.g);
+			partida->players[j].bola.h0 =  pow(v,2)/(2*partida->campo.g) + partida->players[j].altura;
+			partida->players[j].bola.g = partida->campo.g;
+			system("cls");
+			printf("Launch Velocity: 0.00\n");
+			partida->players[j].bola.v = velocidadeLanzamento(20,partida->campo.g);
+			system("cls");
+			printf("Launch Angle: 1.00\n");
+			partida->players[j].bola.ang = anguloLanzamento();
+			
+		}
+	}
 }

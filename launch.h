@@ -19,11 +19,12 @@ typedef struct bola{
 	//datosExtra
 	float hMax;
 	float distCesto;
+	float g;
 }BOLA;
 
-/*void launch_time(BOLA *bola, float t){
+void launch_time(BOLA *bola, float t){
 	bola->x = bola->v*cos(bola->ang)*t;
-	bola->y = bola->h0 + bola->v*sin(bola->ang)*t -(float)( 0.5*g*pow(t,2));
+	bola->y = bola->h0 + bola->v*sin(bola->ang)*t -(float)( 0.5*bola->g*pow(t,2));
 	//printf("%f %f %f\n",bola->x,bola->y,t);
 }
 
@@ -41,7 +42,7 @@ void printParabola(BOLA *bola,int sizeLinhas,int sizeColumnas){
 
 
 void parabola(BOLA *bola){
-	 bola->hMax = bola->h0+pow((bola->v*sin(bola->ang)),2)/(2*g);
+	 bola->hMax = bola->h0+pow((bola->v*sin(bola->ang)),2)/(2*bola->g);
 	 int sizeLinhas = 5+(int)bola->hMax*carateresPorMetro;
 	 int sizeColumnas = 2+(int)bola->distCesto*carateresPorMetro;
 
@@ -86,4 +87,4 @@ void parabola(BOLA *bola){
 
 	 free(bola->parabola);
 
-}*/
+}
