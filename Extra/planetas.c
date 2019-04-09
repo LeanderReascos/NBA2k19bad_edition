@@ -11,7 +11,7 @@ typedef struct planeta
 }PLANETA;
 
 void crearPlaneta(){
-	PLANETA planeta[9] = {{"Sun",30,22,274.13},{"Mercury",10,6,3.7},{"Venus",20,17,8.87},{"Earth",15,11,9.81},{"Mars",12,8,3.71},{"Jupiter",22,18,24.79},{"Saturn",25,21,10.44},{"Uranus",16,12,8.87},{"Neptune",17,13,11.15}};
+	PLANETA planeta[9] = {{"Sun",75,70,274.13},{"Mercury",7.5,7,3.7},{"Venus",22.5,21,8.87},{"Earth",15,14,9.81},{"Mars",12,11.2,3.71},{"Jupiter",27,25.2,24.79},{"Saturn",30,28,10.44},{"Uranus",16.5,15.4,8.87},{"Neptune",19.5,18.2,11.15}};
 
 	FILE *fp;
 	fp = fopen("planets.data","wb");
