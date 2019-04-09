@@ -3,6 +3,7 @@
 #include "launch.h"
 #include "valoresLaunch.h"
 #include <math.h>
+#include <time.h>
 
 typedef struct jogador{
 	//Base de datos
@@ -35,6 +36,90 @@ typedef struct planeta{
 	float g;
 	
 }PLANETA;
+
+
+
+float random(float min, float max){
+	
+	float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
+    return min + scale * ( max - min ); 
+}
+
+
+void gerarPosicoes(PLAYER* jogador,CAMPO* campo,int n){
+	
+	//LIMITES ZONA 1
+	float xmin1=(5.05/15)*(campo->largo);
+	float xmax1=(campo->largo)-xmin1;
+		
+	float rquadrado=pow((1.8/15)*(campo->largo),2);
+	
+
+	//LIMITES ZONA 2
+		
+	float xmin2=0.9/15*(campo->largo);
+	float xmax2=(campo->largo)-xmin2;
+	float a=-6.75/14*(campo->ancho)/pow((xmin2-(campo->largo)/2),2);
+		
+		
+	//LIMITES ZONA 3
+	float xmin3=0;
+	float xmax3=campo->largo;
+
+
+	switch (n){
+		case 1:
+		
+			
+			jogador->posX=random(xmin1,xmax1);
+			
+			float xlinha=abs((campo->largo)/2-(jogador->posX));	                                        //temos que o ylinha da circunferencia é igual a sqrt de (rquadrado-xlinha^2)
+			float ymax=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha,2)) ;
+			
+			jogador->posY=random(0,ymax);
+
+			break;
+			
+			
+		case 2:
+			
+			jogador->posX=random(xmin2,xmax2);
+			float xlinha2=abs((campo->largo)/2-(jogador->posX));
+			float ymin2=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha2,2)) ;                                          //zona 1 para os casos em que x "esta dentro desta"
+						
+			float ymax2=a*pow(((jogador->posX)-(campo->largo)/2),2)+6.75/14*(campo->ancho);
+
+			
+			if((jogador->posX)>xmin1 &&((jogador->posX)<xmax1)){
+				jogador->posY=random(ymin2,ymax2);
+			}
+			else{
+				jogador->posY=random(0,ymax2);}
+			break;
+		
+		case 3:
+		    jogador->posX=random(xmin3,xmax3);
+		
+			
+			float ymin=a*pow(((jogador->posX)-(campo->largo)/2),2)+6.75/14*(campo->ancho);               //zona 2 para os casos em que bla bla bla
+			
+			
+			if(((jogador->posX)>xmin2)&&((jogador->posX)<xmax2)){
+				
+				jogador->posY=random(ymax2,campo->ancho);
+				
+			}
+			else{
+				jogador->posY=random(0,campo->ancho);
+			}
+			
+			break;	
+	}	
+}
+
+
+
+
 
 void printPlayer(PLAYER *player){
 	printf("\t%s\n\t%f\n",player->name,player->altura);
@@ -96,8 +181,6 @@ void readPlayer(PLAYER *player,int n){
 		}
 		i++;
 	}
-
-
 }
 
 void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
@@ -140,6 +223,13 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 			break;
 	}
 	
+	for(i=0; i<partida->njogadores; i++){
+		gerarPosicoes(&partida->players[i],&partida->campo,3);
+		printf("%f %f\n",partida->players[i].posX,partida->players[i].posY);
+		system("pause");
+		addJugador(partida->players[i].posX,partida->players[i].posY,'0'+i+1,&partida->campo);
+	}
+
 }
 
 void freeMemoryPartida(PARTIDA *partida){
@@ -149,6 +239,7 @@ void freeMemoryPartida(PARTIDA *partida){
 }
 
 void NEWGAME(PARTIDA *partidanova ,int opcao){
+	srand((unsigned int)time(NULL));
 
 	PLANETA* planeta;
 	planeta=(PLANETA*) malloc(sizeof(PLANETA));
