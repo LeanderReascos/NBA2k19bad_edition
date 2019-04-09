@@ -3,6 +3,7 @@
 #include "main.h"
 #include "partida.h"
 #include "novojogador.h"
+#include <time.h>
 
 void adicionarjugadores(PARTIDA *partida){
 	int i,x;
@@ -38,7 +39,7 @@ int main(int argc, char const *argv[])
 				printPartida(partida);
 				printf("\n");
 				system("pause");
-				playGame(partida);
+				/*playGame(partida);*/
 				break;
 
 			case 3:
