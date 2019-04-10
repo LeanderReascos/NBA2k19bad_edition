@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
 				printPartida(partida);
 				printf("\n");
 				system("pause");
-				/*playGame(partida);*/
+				playGame(partida);
 				break;
 
 			case 3:

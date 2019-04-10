@@ -4,8 +4,8 @@
 
 //#define g 9.81
 #define hCesto 3.05
-#define carateresPorMetro 5
-#define radioCesto 0.45
+#define carateresPorMetro 10
+#define diametroCesto 0.45
 
 typedef struct bola{
 	float h0;  // Pos em y inicinal
@@ -20,6 +20,9 @@ typedef struct bola{
 	float hMax;
 	float distCesto;
 	float g;
+	int cesto;
+	int bonus;
+	int before;
 }BOLA;
 
 void launch_time(BOLA *bola, float t){
@@ -40,9 +43,31 @@ void printParabola(BOLA *bola,int sizeLinhas,int sizeColumnas){
 	 }
 }
 
+void verificaCesto(BOLA *bola){
+	int enX = bola->x < bola->distCesto+(diametroCesto/2) && bola->x > bola->distCesto-(diametroCesto/2);
+	int enY = bola->y < hCesto+(diametroCesto/2) && bola->y > hCesto-(diametroCesto/2);
+
+	int beY =  bola->y > hCesto+(diametroCesto/2);
+	if(enX && beY){
+		bola->before = 1;
+	}
+	if(enX && enY && bola->before){
+		bola->bonus = 1;
+		bola->cesto = 1;
+	}
+}
+
+void newBola(BOLA *bola){
+	bola->bonus = 0;
+	bola->cesto = 0;
+	bola->before = 0;
+}
+
 
 void parabola(BOLA *bola){
+	newBola(bola);
 	 bola->hMax = bola->h0+pow((bola->v*sin(bola->ang)),2)/(2*bola->g);
+	 if(bola->hMax < hCesto) bola->hMax = hCesto+1;
 	 int sizeLinhas = 5+(int)bola->hMax*carateresPorMetro;
 	 int sizeColumnas = 2+(int)bola->distCesto*carateresPorMetro;
 
@@ -64,7 +89,7 @@ void parabola(BOLA *bola){
 	 int posXCesto = (int) bola->distCesto*carateresPorMetro;
 	 int posYCesto = sizeLinhas-(int) hCesto*carateresPorMetro;
 
-	 for(i=0;i<(int)(radioCesto*carateresPorMetro);i++){
+	 for(i=0;i<(int)(diametroCesto*carateresPorMetro);i++){
 	 	if(posYCesto < 0) break;
 	 	 bola->parabola[posYCesto][posXCesto-i]='~'; 
 	 	 bola->parabola[posYCesto][posXCesto+i]='~'; 
@@ -78,13 +103,16 @@ void parabola(BOLA *bola){
 	 	int x,y;
 	 	y = (int)(sizeLinhas-bola->y*carateresPorMetro);
 	 	x = (int)(bola->x*carateresPorMetro);
+	 	verificaCesto(bola);
 	 	//printf("%f        %d %d      %f  %f\n",t,x,y,bola->x, bola->y);
-	 	if(!(bola->x>=0 &&bola->y>=0 && x<=sizeColumnas))	
-	 		break;
-	 	bola->parabola[y][x]='@'; 
-	 	printParabola(bola,sizeLinhas,sizeColumnas);
+	 	if(bola->x>=0 &&bola->y>0 && x<=sizeColumnas && y>=0){
+	 		bola->parabola[y][x]='@'; 
+	 		printParabola(bola,sizeLinhas,sizeColumnas);
+	 	}
+	 		
 	 }while(bola->y > 0);
 
 	 free(bola->parabola);
 
 }
+
