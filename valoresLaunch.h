@@ -1,5 +1,8 @@
 #include <conio.h>
+#include <math.h>
 #define gBase  9.81
+#define porcentajeY 0.08571
+#define porcentajeX 0.5
 
 int readTecla(){
 	 char cTecla;
@@ -99,11 +102,11 @@ float velocidadeLanzamento(float vMax, float g1){
 			aux = 1;
 		}
 
-		else if((a == 80)  && velocidadeLanzamento >= 0){
+		else if((a == 80)  && velocidadeLanzamento >= 1){
 			velocidadeLanzamento-=0.1;
 			aux = 0;
 		}
-		else if(a == 75) velocidadeLanzamento = 0;
+		else if(a == 75) velocidadeLanzamento = 1;
 		else if(a == 77) velocidadeLanzamento = vMax;	
 		else if(a == 9){
 			switch(aux){
@@ -114,7 +117,7 @@ float velocidadeLanzamento(float vMax, float g1){
 			}
 		}
 		if(velocidadeLanzamento > vMax)		velocidadeLanzamento = vMax;
-		if(velocidadeLanzamento < 0) velocidadeLanzamento = 0;
+		if(velocidadeLanzamento < 1) velocidadeLanzamento = 1;
 		system("cls");
 		printf("Launch Velocity: %f\n", velocidadeLanzamento);
 				
@@ -142,7 +145,7 @@ float anguloLanzamento(){
 			anguloLanzamento-=0.1;
 			aux = 0;
 		}
-		else if(a == 75) anguloLanzamento = 0;
+		else if(a == 75) anguloLanzamento = 1;
 		else if(a == 77) anguloLanzamento = angMax;	
 		else if(a == 9){
 			switch(aux){
@@ -162,4 +165,12 @@ float anguloLanzamento(){
 	
 
 	return anguloLanzamento;
+}
+
+float distCesto(float Jx,float Jy,float dX, float dY){
+	float posCestoX = dX*porcentajeX;
+	float posCestoY = dY*porcentajeY;
+	float x = pow((posCestoX-Jx),2);
+	float y = pow((posCestoY-Jy),2);
+	return sqrt(x+y);
 }

@@ -5,6 +5,8 @@
 #include <math.h>
 #include <time.h>
 
+#define PI 3.14
+
 typedef struct jogador{
 	//Base de datos
 	char *name;
@@ -47,72 +49,84 @@ float random(float min, float max){
 
 
 void gerarPosicoes(PLAYER* jogador,CAMPO* campo,int n){
-	
+
 	//LIMITES ZONA 1
 	float xmin1=(5.05/15)*(campo->largo);
 	float xmax1=(campo->largo)-xmin1;
-		
-	float rquadrado=pow((1.8/15)*(campo->largo),2);
-	
+
+	float rquadrado=pow((2.45/15)*(campo->largo),2);
+
 
 	//LIMITES ZONA 2
-		
+
 	float xmin2=0.9/15*(campo->largo);
 	float xmax2=(campo->largo)-xmin2;
-	float a=-6.75/14*(campo->ancho)/pow((xmin2-(campo->largo)/2),2);
-		
-		
-	//LIMITES ZONA 3
-	float xmin3=0;
-	float xmax3=campo->largo;
+	float a=-8.95/14*(campo->ancho)/pow((xmin2-(campo->largo)/2),2);
+
+
+
 
 
 	switch (n){
 		case 1:
-		
-			
+
+
 			jogador->posX=random(xmin1,xmax1);
-			
-			float xlinha=abs((campo->largo)/2-(jogador->posX));	                                        //temos que o ylinha da circunferencia é igual a sqrt de (rquadrado-xlinha^2)
+			float xcesto1=(campo->largo)/2-1;
+			float xcesto2=(campo->largo)/2+1;
+
+
+			float xlinha=fabs((campo->largo)/2-(jogador->posX));	                                        //temos que o ylinha da circunferencia  igual a sqrt de (rquadrado-xlinha^2)
 			float ymax=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha,2)) ;
-			
-			jogador->posY=random(0,ymax);
 
+
+		if(((jogador->posX)>xcesto1 ) && ((jogador->posX)<xcesto2)){
+			float ymin=(8.57/100)*(campo->ancho)+sqrt(1-pow(xlinha,2));
+			jogador->posY=random(ymin,ymax);
+
+
+		}
+
+		else{
+
+			jogador->posY=random(8.57/100*(campo->ancho),ymax);
+		}
 			break;
-			
-			
-		case 2:
-			
-			jogador->posX=random(xmin2,xmax2);
-			float xlinha2=abs((campo->largo)/2-(jogador->posX));
-			float ymin2=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha2,2)) ;                                          //zona 1 para os casos em que x "esta dentro desta"
-						
-			float ymax2=a*pow(((jogador->posX)-(campo->largo)/2),2)+6.75/14*(campo->ancho);
 
-			
+
+		case 2:
+
+			jogador->posX=random(xmin2,xmax2);
+			float xlinha2=fabs((campo->largo)/2-(jogador->posX));
+			float ymin2=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha2,2)) ;                                          //zona 1 para os casos em que x "esta dentro desta"
+
+			float ymax2=a*pow(((jogador->posX)-(campo->largo)/2),2)+8.95/14*(campo->ancho);
+
+
 			if((jogador->posX)>xmin1 &&((jogador->posX)<xmax1)){
 				jogador->posY=random(ymin2,ymax2);
 			}
 			else{
-				jogador->posY=random(0,ymax2);}
+				jogador->posY=random(((8.57/100)*(campo->ancho)),ymax2);}
 			break;
-		
+
 		case 3:
-		    jogador->posX=random(xmin3,xmax3);
-		
-			
-			float ymin=a*pow(((jogador->posX)-(campo->largo)/2),2)+6.75/14*(campo->ancho);               //zona 2 para os casos em que bla bla bla
-			
-			
-			if(((jogador->posX)>xmin2)&&((jogador->posX)<xmax2)){
-				
-				jogador->posY=random(ymax2,campo->ancho);
-				
+		    jogador->posX=random(0,campo->largo);
+
+
+			float ymin=a*pow(((jogador->posX)-(campo->largo)/2),2)+8.95/14*(campo->ancho);               
+
+			do{
+			if(((jogador->posX)>xmin2)&&((jogador->posX)<xmax2))
+			{
+				jogador->posY=random(ymin,campo->ancho);
 			}
+
 			else{
-				jogador->posY=random(0,campo->ancho);
+				jogador->posY=random((8.57/100)*(campo->ancho),campo->ancho);
 			}
-			
+			}while((jogador->posY)<(8.57/100)*(campo->ancho));
+
 			break;	
 	}	
 }
@@ -224,7 +238,7 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 	}
 	
 	for(i=0; i<partida->njogadores; i++){
-		gerarPosicoes(&partida->players[i],&partida->campo,3);
+		gerarPosicoes(&partida->players[i],&partida->campo,1);
 		printf("%f %f\n",partida->players[i].posX,partida->players[i].posY);
 		system("pause");
 		addJugador(partida->players[i].posX,partida->players[i].posY,'0'+i+1,&partida->campo);
@@ -297,6 +311,8 @@ void playGame(PARTIDA *partida){
 			printf("\n");
 			system("pause");
 			system("cls");
+			partida->players[j].bola.distCesto = distCesto(partida->players[j].posX,partida->players[j].posY,partida->campo.largo,partida->campo.ancho);
+			printf("Distance to the basket: %f\n", partida->players[j].bola.distCesto);
 			printf("Jump Velocity: 0.00\n");
 			float v = velocidadeSalto(partida->players[j].altura,partida->campo.g);
 			partida->players[j].bola.h0 =  pow(v,2)/(2*partida->campo.g) + partida->players[j].altura;
@@ -306,7 +322,13 @@ void playGame(PARTIDA *partida){
 			partida->players[j].bola.v = velocidadeLanzamento(20,partida->campo.g);
 			system("cls");
 			printf("Launch Angle: 1.00\n");
-			partida->players[j].bola.ang = anguloLanzamento();
+			partida->players[j].bola.ang = anguloLanzamento()*PI/180;
+			parabola(&partida->players[j].bola);
+			system("pause");
+			if(partida->players[j].bola.cesto)
+				printf("CESTO\n");
+			system("pause");
+
 			
 		}
 	}
