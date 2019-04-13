@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 
+
 void novoJogador(){
     char nome[100];
  	float altura;
@@ -18,6 +19,7 @@ void novoJogador(){
 	 printf ("\n");
      printf ("What's your player name? \n 	"); 
      scanf (" %[^\n]%*c", nome);
+     //verificarNovoJogador(nome);
      printf("What's your heigh? \n 	");
  	 scanf ("%f",&altura);
      fprintf(fp,"%s-%.2f\n", nome,altura); 
@@ -25,3 +27,4 @@ void novoJogador(){
 
 	fclose(fp);
 }
+
