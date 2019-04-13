@@ -81,8 +81,7 @@ float velocidadeSalto(float alturaJogador, float g1){
 		}
 		if(velocidadeSalto > vMax)		velocidadeSalto = vMax;
 		if(velocidadeSalto < 0) velocidadeSalto = 0;
-		system("cls");
-		printf("Jump Velocity: %f\n", velocidadeSalto);
+		printf("\r\tJump Velocity: %.2f",velocidadeSalto);
 				
 	}while(a != 0);
 
@@ -118,8 +117,7 @@ float velocidadeLanzamento(float vMax, float g1){
 		}
 		if(velocidadeLanzamento > vMax)		velocidadeLanzamento = vMax;
 		if(velocidadeLanzamento < 1) velocidadeLanzamento = 1;
-		system("cls");
-		printf("Launch Velocity: %f\n", velocidadeLanzamento);
+		printf("\r\tLaunch Velocity: %.2f",velocidadeLanzamento);
 				
 	}while(a != 0);
 
@@ -157,8 +155,7 @@ float anguloLanzamento(){
 		}
 		if(anguloLanzamento > angMax)		anguloLanzamento = angMax;
 		if(anguloLanzamento < angMin) anguloLanzamento = angMin;
-		system("cls");
-		printf("Launch Angle: %f\n", anguloLanzamento);
+		printf("\r\tLaunch Angle: %.2f",anguloLanzamento);
 				
 	}while(a != 0);
 

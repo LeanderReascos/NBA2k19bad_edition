@@ -26,6 +26,10 @@ void addJugador(float x, float y, char n, CAMPO *campo){
 }
 
 void freeCampo(CAMPO *campo){
+	int i,j;
+	for(i=0; i<campo->lin; i++){
+		free(campo->campoDeJuego[i]);
+	}
 	free(campo->campoDeJuego);
 }
 

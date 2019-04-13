@@ -40,6 +40,8 @@ int main(int argc, char const *argv[])
 				printf("\n");
 				system("pause");
 				playGame(partida);
+				system("cls");
+				
 				break;
 
 			case 3:
