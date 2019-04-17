@@ -7,6 +7,7 @@
 
 #define PI 3.14
 #define POSINICIO 1
+#define TENTATIVAS 5;
 
 typedef struct jogador{
 	//Base de datos
@@ -31,6 +32,7 @@ typedef struct partida{
 	int nPlaneta;
 	PLAYER *players;
 	CAMPO  campo;
+	int tentativas;
 	
 }PARTIDA;
 
@@ -40,6 +42,7 @@ typedef struct planeta{
 	float lcampo;
 	float acampo;
 	float g;
+
 	
 }PLANETA;
 
@@ -259,6 +262,7 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 			break;
 		case(3):
 			for(i=0;i<partida->njogadores;i++){
+				system("color 4f");
 				partida->players[i].numeroRondas=1;
 				partida->nRondas = 1;
 				partida->players[i].pontosRondas=(int*) malloc(sizeof(int));
@@ -323,6 +327,36 @@ void NEWGAME(PARTIDA *partidanova ,int opcao){
 		
 	}while(i!=opcao && i<=9);
 
+	switch(opcao){
+		case 1:
+				system("color 06");
+				break;
+		case 2:
+				system("color 0e");
+				break;
+		case 3:
+				system("color 08");
+				break;
+		case 4:
+				system("color 02");
+				break;
+		case 5:
+				system("color 84");
+				break;
+		case 6:
+				system("color e0");
+				break;
+		case 7:
+				system("color 03");
+				break;
+		case 8:
+				system("color 02");
+				break;
+		case 9:
+				system("color 09");
+				break;
+	}
+	partidanova->tentativas = TENTATIVAS;
 
 	partidanova->campo.lChar=128;
 	partidanova->campo.aChar=50;
@@ -455,54 +489,7 @@ void printPartida(PARTIDA *partida){
 
 }
 
-void runRonda(PARTIDA *partida, int j,int i){
-	system("cls");
-	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
-	printf("\n");
-	printtext(partida->modoDeJogo,"Ficheiros_de_texto/modesVisual",7);
-	printf("\n\n\n");
-	printEncabezado(partida->nRondas);
-	if(j<9)
-		printf("| %d  ",j+1);
-	else 
-		printf("| %d ",j+1);
-	printPlayer(&partida->players[j]);
-	partida->players[j].bola.distCesto = distCesto(partida->players[j].posX,partida->players[j].posY,partida->campo.largo,partida->campo.ancho);
-	printf("\nVALUES: \n");
-	printf("\tDistance to the basket: %f\n", partida->players[j].bola.distCesto);
-	printf("\tJump Velocity: 0.00");
-	float v = velocidadeSalto(partida->players[j].altura,partida->campo.g);
-	partida->players[j].bola.h0 =  pow(v,2)/(2*partida->campo.g) + partida->players[j].altura;
-	partida->players[j].bola.g = partida->campo.g;
-	printf("\n");
-	printf("\tLaunch Velocity: 1.00");
-	partida->players[j].bola.v = velocidadeLanzamento(20,partida->campo.g);
-	printf("\n");
-	printf("\tLaunch Angle: 1.00");
-	partida->players[j].bola.ang = anguloLanzamento()*PI/180;
-	geraObstaculo(&partida->players[j].bola,partida->players[j].zona);
-	parabola(&partida->players[j].bola);
-	system("pause");
-	if(partida->players[j].bola.cesto){
-		printf("Cesto\n");
-		somaPontos(&partida->players[j],i,partida->players[j].bola.bonus);
-		partida->players[j].bola.bonus = 1;
-		if(partida->players[j].zona < 3)
-			adaptaZona(&partida->players[j],&partida->campo,1);
-		else
-			adaptaZona(&partida->players[j],&partida->campo,3);
-	}
-	else{
-		partida->players[j].bola.bonus = 0;
-		if(partida->players[j].zona > 1)
-			adaptaZona(&partida->players[j],&partida->campo,2);
-		else
-			adaptaZona(&partida->players[j],&partida->campo,3);
-	}
-			
-			
-			
-}
+
 
 void ordenar(PARTIDA *partida){
 	int i,j;
@@ -525,12 +512,188 @@ void ordenar(PARTIDA *partida){
 }
 
 
+void infoprintPlayer(PLAYER *player,FILE *info){
+	int i;
+	int n = strlen(player->name);
+	fprintf(info,"|%s",player->name);
+	for (i=n; i<24; i++){
+		fprintf(info," ");
+	}
+	fprintf(info,"|   %.2f   ",player->altura);
+
+	for(i=0; i<player->numeroRondas;i++){
+		fprintf(info,"|     %d     ",player->pontosRondas[i]);
+	}
+	fprintf(info,"|\n");
+}
+
+void fprintText(int n,char file[100],int a, FILE *info){
+	FILE *fp;
+	fp = fopen(file,"r");
+	if(fp == NULL) exit(-1);
+
+	int i=0;
+	char buffer[160];
+	while(fgets(buffer,sizeof(buffer),fp) && i < n*a ){
+		if(i >= n*a-a)
+			fprintf(info,"%s",buffer);
+		i++;
+	}
+	fclose(fp);
+}
+
+void informacao(PARTIDA *partida){
+	char name[100];
+	printf("What do you want to name the file containing game information? \n");
+	scanf (" %[^\n]%*c", name);
+	strcat(name,".txt");
+
+	FILE *information;
+	information = fopen(name,"w");
+
+	FILE *header;
+	header = fopen("Ficheiros_de_texto/header","r");
+	char buffer[250];
+	while(fgets(buffer,sizeof(buffer),header)){
+		fprintf(information, "%s",buffer);
+	}
+	fprintf(information, "\n\n\n\n\n");
+
+	fprintText(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16,information);
+	fprintf(information,"\n");
+	fprintText(partida->modoDeJogo,"Ficheiros_de_texto/modesVisual",7,information);
+	fprintf(information,"\n\n\n");
+
+	int i;
+	int n=partida->nRondas;
+	fprintf(information,"| No |          NAME          |  HEIGHT  |");
+	for(i=0; i<n;i++){
+		fprintf(information,"  RONDA %d  |",i+1);
+	}
+
+
+	fprintf(information,"\n");
+	for(i=0; i<42+12*n; i++){
+		fprintf(information,"-");
+	}
+	fprintf(information,"\n");
+
+
+	for(i=0; i<partida->njogadores;i++){
+		if(i<9)
+			fprintf(information,"| %d  ",i+1);
+		else 
+			fprintf(information,"| %d ",i+1);
+		infoprintPlayer(&partida->players[i],information);
+	}
+
+	fprintf(information,"\n");
+
+
+	fclose(header);
+	fclose(information);
+}
+
+void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
+	system("cls");
+	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
+	printf("\n");
+	printtext(partida->modoDeJogo,"Ficheiros_de_texto/modesVisual",7);
+	printf("\n\n\n");
+	printPartida(partida);
+	printf("\n\n");
+	if(j<9)
+		printf("| %d  ",j+1);
+	else 
+		printf("| %d ",j+1);
+	printPlayer(&partida->players[j]);
+	partida->players[j].bola.distCesto = distCesto(partida->players[j].posX,partida->players[j].posY,partida->campo.largo,partida->campo.ancho);
+	printf("\nVALUES: \n");
+	printf("\tTry number %d\n",k+1);
+	printf("\tDistance to the basket: %f\n", partida->players[j].bola.distCesto);
+	printf("\tJump Velocity: 0.00");
+	float v = velocidadeSalto(partida->players[j].altura,partida->campo.g);
+	partida->players[j].bola.h0 =  pow(v,2)/(2*partida->campo.g) + partida->players[j].altura;
+	partida->players[j].bola.g = partida->campo.g;
+	printf("\n");
+	printf("\tLaunch Velocity: 1.00");
+	partida->players[j].bola.v = velocidadeLanzamento(20,partida->campo.g);
+	printf("\n");
+	printf("\tLaunch Angle: 1.00");
+	partida->players[j].bola.ang = anguloLanzamento()*PI/180;
+	if(k == 0 || nFallos > 1){
+		switch(partida->players[j].zona){
+			case 1:
+					partida->players[j].bola.aux = 0;				
+					break;
+			case 2:
+					partida->players[j].bola.aux = 1;	
+					break;
+			case 3:
+					partida->players[j].bola.aux = (rand() % 3)+1;	
+					break;
+		}
+		geraObstaculo(&partida->players[j].bola);
+	}
+	
+	parabola(&partida->players[j].bola);
+	system("pause");		
+			
+}
+
+int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
+	int aux;
+
+	if(partida->players[j].bola.cesto){
+		somaPontos(&partida->players[j],i,partida->players[j].bola.bonus);
+		partida->players[j].bola.bonus = 1;
+		if(partida->players[j].zona < 3)
+			adaptaZona(&partida->players[j],&partida->campo,1);
+		else
+			adaptaZona(&partida->players[j],&partida->campo,3);
+
+		(*nFallos) = 0;
+		aux = 0;
+	}
+	else 
+		(*nFallos)++;
+
+	if(k == partida->tentativas -1 || (*nFallos) > 1){
+		partida->players[j].bola.bonus = 0;
+		if(partida->players[j].zona > 1)
+			adaptaZona(&partida->players[j],&partida->campo,2);
+		else
+			adaptaZona(&partida->players[j],&partida->campo,3);
+		(*nFallos) = 0;
+		aux = 1;
+	}
+	else {
+		partida->players[j].bola.bonus = 0;
+		aux = 1;
+	}
+
+	readCampo(&partida->campo);
+
+	addJugador(partida->players[j].posX,partida->players[j].posY,'0'+j+1,&partida->campo);	
+
+	
+	return aux;
+}
+
 
 void playGame(PARTIDA *partida){
-	int i,j;
-	for(i=0; i<partida->nRondas; i++){
+	int i,j,k;
+	int aux;
+	int nFallos = 0;
+	for(i=0; i<partida->nRondas ; i++){
 		for(j=0; j<partida->njogadores;j++){
-			runRonda(partida,j,i);
+			aux = 1;
+			for(k=0; k<partida->tentativas  && aux; k++){
+				runRonda(partida,j,i,k,nFallos);
+				aux = confirmRonda(partida,j,i,k,&nFallos);
+				system("del obstaculo");
+				system("del parabola");
+			}
 		}
 	}
 	if(VeRondas(partida)){
@@ -538,11 +701,14 @@ void playGame(PARTIDA *partida){
 		printf("%d\n",partida->nRondas );
 		for(i=1; i<=partida->nRondas; i++){
 			for(j=0; j<partida->njogadores;j++){
-				runRonda(partida,j,i);
+				for(k=0; k<partida->tentativas  && aux; k++){
+					runRonda(partida,j,i,k,nFallos);
+					aux = confirmRonda(partida,j,i,k,&nFallos);
+				}	
 			}
 		}
 	}
 	ordenar(partida);
 	system("pause");
-
+	informacao(partida);
 }
