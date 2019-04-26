@@ -4,6 +4,12 @@
 #include "partida.h"
 #include "novojogador.h"
 #include <time.h>
+#include "instrucciones.h"
+
+#define NUEVOJUEGO 1
+#define EXIT 4
+#define NEWPLAYER 2
+#define INSTRUCCIONES 3
 
 void adicionarjugadores(PARTIDA *partida){
 	int i,x;
@@ -15,16 +21,41 @@ void adicionarjugadores(PARTIDA *partida){
 	}
 }
 
+void openMusic(){
+	FILE * file;
+	file=fopen("MUSICAS/.commands","w");
+	if(file==NULL){
+		printf("nao abriu commands\n");
+		exit(-1);
+	}
+	fprintf(file, "play");
+	fclose(file);
+
+	FILE *py;
+    py = popen("py", "w");
+    if (py == NULL) {
+        printf("Erro ao abrir pipe para o python.\n"
+            "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
+        exit(0);
+    }
+    fprintf(py, "exec(open('MUSICAS/game.py').read())");
+
+    fclose(py);
+}
+
 int main(int argc, char const *argv[])
 {
+	openMusic();
+
 	int op,x;
 	PARTIDA *partida = (PARTIDA*) malloc(sizeof(PARTIDA)); 
 	do{
 		op = mainSelect("Ficheiros_de_texto/main");
 		switch(op){
-			case 1:
+			case INSTRUCCIONES:
+				instructions();
 				break;
-			case 2:
+			case NUEVOJUEGO:
 				x = mainSelect("Ficheiros_de_texto/planets");
 				system("cls");
 				printHeader();
@@ -44,13 +75,14 @@ int main(int argc, char const *argv[])
 				
 				break;
 
-			case 3:
+			case NEWPLAYER:
 				system("cls");
 				printHeader();
 				novoJogador();
 				break;
-			case 4:
+			case EXIT:
 			case 0:
+				Musica('s');
 				if(partida == NULL)
 					freeMemoryPartida(partida);
 				break;

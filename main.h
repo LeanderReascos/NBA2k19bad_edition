@@ -1,6 +1,6 @@
 #include <string.h>
 #include <conio.h>
-
+#include "menuSongs.h"
 void freeMemoryMain(char **main, int n){
   int i;
   for(i=0; i<n;i++){
@@ -102,6 +102,18 @@ int mainSelect(char fileMenu[]){
         break;
       case 77://DERECHA
         break;
+      case 'p'://Pause music
+        Musica('p');
+        break; 
+      case 'n':
+        Musica('n');
+        break;
+      case 'b':
+        Musica('b');
+        break;
+      case 's':
+        Musica('s');
+          break;
       default:
         break;
     }  

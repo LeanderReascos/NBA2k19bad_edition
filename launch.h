@@ -57,31 +57,41 @@ float random(float min, float max){
 }
 
 void geraObstaculo(BOLA* bola){
-
 	switch (bola->aux){
 			case 0:                 //    sem obstaculo
 			break;
 
 			case 1:					//obstaculo estatico
-			bola->obstaculo.x=random(1,bola->distCesto-1);
-			bola->obstaculo.y=random(0,2)+hCesto;
-			break;
+				bola->obstaculo.x=random(1,bola->distCesto-1);
+				bola->obstaculo.y=random(0,2)+hCesto;
+				break;
 
 			case 2:					//drone com movimento "aleatorio"
-			bola->obstaculo.xdist=random(1,bola->distCesto-1);
-			bola->obstaculo.ymax=random(0,1);                        
-			bola->obstaculo.vd=random(0,5);
-			bola->obstaculo.teta=random(0,pi/2);
-			bola->obstaculo.ax=random(-7,7);
-			bola->obstaculo.ay=random(0,7);
+				bola->obstaculo.xdist=random(1,bola->distCesto-1);
+			
+				if(bola->obstaculo.xdist<(bola->distCesto/2)){
+						bola->obstaculo.ax=random(0,7);
+					
+				}
+				else{
+						bola->obstaculo.ax=random(-7,0);
+				}
+				
+			
+				
+				
+				bola->obstaculo.ymax=random(0,1);                        
+				bola->obstaculo.vd=random(3,10);
+				bola->obstaculo.teta=random(0,pi/2);
+				bola->obstaculo.ay=random(2,7);
 
 
-			break;
+				break;
 
 			case 3:				//drone com movimento harmonnico
-			bola->obstaculo.xdist=random(1,bola->distCesto-1);
-			bola->obstaculo.ymax=random(0,2)+hCesto;                         ///altura maxima do drone que se move na vertical-AMPLITUDE DO MOVIMENTO HARMONICO*2
-			bola->obstaculo.teta=random(2*pi, 6*pi);                                 //usamos o teta neste caso para definir a frequancia angular do movimento
+				bola->obstaculo.xdist=random(1,bola->distCesto-1);
+				bola->obstaculo.ymax=random(0,2)+hCesto;                         ///altura maxima do drone que se move na vertical-AMPLITUDE DO MOVIMENTO HARMONICO*2
+				bola->obstaculo.teta=random(2*pi, 6*pi);                                 //usamos o teta neste caso para definir a frequancia angular do movimento
 			break;
 
 
@@ -94,7 +104,7 @@ void verificaCesto(BOLA *bola){
 	int enY = bola->y < hCesto+(diametroCesto/2) && bola->y > hCesto-(diametroCesto/2);
 
 	int beY =  bola->y > hCesto;
-	//printf("X> %f %d %d %d Y> %f\n",bola->x, enX,enY,beY,bola->y);
+	//printf("X> %f EnX> %d EnY> %d BeY> %d Y> %f BEFORE> %d CESTO> %d\n",bola->x, enX,enY,beY,bola->y,enX && beY,enX && enY && bola->before);
 	if(enX && beY){
 		//printf("Ant\n");
 		bola->before = 1;
@@ -150,12 +160,10 @@ void printParabola(BOLA *bola){
     }
     fprintf(gp, "set yrange[0:%f]\n", bola->hMax);
     fprintf(gp, "set xrange[0:%f]\n", bola->distCesto);
-    fprintf(gp, "set object circle at first %f,%f radius char %f \n",bola->distCesto-0.012,hCesto,diametroCesto);
-    fprintf(gp, "plot x\n");
     if(bola->aux > 0)
-    	fprintf(gp, "plot 'obstaculo','%s'\n",GRAPH);
+    	fprintf(gp, "plot 'obstaculo','%s','cesto'\n",GRAPH);
     else
-    	fprintf(gp, "plot '%s'\n",GRAPH);
+    	fprintf(gp, "plot '%s','cesto'\n",GRAPH);
 
     fclose(gp);
 
@@ -166,6 +174,21 @@ void newBola(BOLA *bola){
 	bola->before = 0;
 }
 
+void cestoDesign(float distCesto){
+	FILE *cesto;
+		cesto = fopen("cesto", "w");
+		if(cesto == NULL) {
+			printf("ERROR\n");
+			exit(-1);
+		}
+	float aux = 0;
+	while (aux <= diametroCesto/2){
+		fprintf(cesto, "%.3f \t %.3f \n",distCesto-aux,hCesto);
+		fprintf(cesto, "%.3f \t %.3f \n",distCesto+aux,hCesto);
+		aux += 0.1;
+	}
+	fclose(cesto);
+}
 
 void parabola(BOLA *bola){
 	newBola(bola);
@@ -192,6 +215,7 @@ void parabola(BOLA *bola){
 	 int posXCesto = (int) bola->distCesto*carateresPorMetro;
 	 int posYCesto = sizeLinhas-(int) hCesto*carateresPorMetro;
 
+	 cestoDesign(bola->distCesto);
 	 for(i=0;i<(int)(diametroCesto*carateresPorMetro);i++){
 	 	if(posYCesto < 0) break;
 	 	 bola->parabola[posYCesto][posXCesto-i]='~'; 
@@ -227,19 +251,13 @@ void parabola(BOLA *bola){
 			printf("ERROR\n");
 			exit(-1);
 		}
-	 clock_t timeInicial = clock();
-	 float variacao = 0;
+	 float t = 0;
 	 float dt = 0;
-
 	 int pasoObstaculo = 1;
 	 do{
-	 	clock_t time = clock();
-	 	float t = (float)(time-timeInicial)/CLOCKS_PER_SEC;
-	 	launch_time(bola,t-dt);
+	 	launch_time(bola,t);
 	 	fprintf(fp, "%.3f \t %.3f \n", bola->x,bola->y);	
 	 	
-	 	clock_t ti = clock();
-
 	 	int x,y;
 	 	if(bola->aux > 1){
 	 		y = (int)(sizeLinhas-bola->obstaculo.y*carateresPorMetro);
@@ -249,24 +267,26 @@ void parabola(BOLA *bola){
 	 			bola->parabola[y][x]='#'; 
 	 		
 	 	}
-	 	
 		
 	 	y = (int)(sizeLinhas-bola->y*carateresPorMetro);
 	 	x = (int)(bola->x*carateresPorMetro);
 	 	//printf("%f        %d %d      %f  %f\n",t,x,y,bola->x, bola->y);
 	 	if(bola->x>=0 &&bola->y>0 && x<=sizeColumnas && y>=0){
 	 		bola->parabola[y][x]='@'; 
-	 		printMatriz(bola->parabola,sizeLinhas,sizeColumnas);
 	 	}
-	 	clock_t tf = clock();
-	 	dt += (-0.03+(float)(tf-ti)/CLOCKS_PER_SEC);
+
+	 	if(t-dt >= 0.03){
+	 		printMatriz(bola->parabola,sizeLinhas,sizeColumnas);
+	 		dt = t;
+	 	}
 
 		if(bola->aux > 0 && bola->x >= bola->obstaculo.x-0.3 && bola->x <= bola->obstaculo.x+0.3) {
 			pasoObstaculo = bola->y > bola->obstaculo.y;
 		}
+	
 
-	 		
-	 }while(bola->y > 0 && bola->x <= bola->distCesto && pasoObstaculo);
+	 	t += 0.01;	
+	 }while(bola->y > 0 && pasoObstaculo);
 
 	 if(bola->aux > 1 || obs != NULL){
 	 	fclose(obs);

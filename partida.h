@@ -6,7 +6,7 @@
 #include <time.h>
 
 #define PI 3.14
-#define POSINICIO 1
+#define POSINICIO 3
 #define TENTATIVAS 5;
 
 typedef struct jogador{
@@ -273,14 +273,13 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 			}
 			break;
 	}
-	
+	gerarPosicoes(&partida->players[0],&partida->campo,POSINICIO);
 	for(i=0; i<partida->njogadores; i++){
-		gerarPosicoes(&partida->players[i],&partida->campo,POSINICIO);
 		partida->players[i].bola.bonus = 0;
 		partida->players[i].zona = POSINICIO;
-		/*partida->players[i].posX = 1;
-		partida->players[i].posY = 1.2;*/
-		addJugador(partida->players[i].posX,partida->players[i].posY,'0'+i+1,&partida->campo);
+		partida->players[i].posX = partida->players[0].posX;
+		partida->players[i].posY = partida->players[0].posY;
+		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
 	}
 
 }
@@ -594,6 +593,19 @@ void informacao(PARTIDA *partida){
 	fclose(information);
 }
 
+void cesto(){
+	FILE *py;
+    py = popen("py", "w");
+    if (py == NULL) {
+        printf("Erro ao abrir pipe para o python.\n"
+            "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
+        exit(0);
+    }
+    fprintf(py, "exec(open('VIDEOS/video.py').read())");
+
+    fclose(py);
+}
+
 void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
 	system("cls");
 	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
@@ -621,7 +633,7 @@ void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
 	printf("\n");
 	printf("\tLaunch Angle: 1.00");
 	partida->players[j].bola.ang = anguloLanzamento()*PI/180;
-	if(k == 0 || nFallos > 1){
+	if(k == 0 || nFallos%2 == 0){
 		switch(partida->players[j].zona){
 			case 1:
 					partida->players[j].bola.aux = 0;				
@@ -641,10 +653,25 @@ void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
 			
 }
 
+void cestoAux(PLAYER *player, int n){
+	FILE * file2;
+	file2=fopen("VIDEOS/.videos","w");
+	if(file2==NULL){
+		printf("nao abriu commands\n");
+		//exit(-1);
+	}
+	if(n == 1)
+		fprintf(file2, "%s", player->name);
+	else
+		fprintf(file2, "haha");
+	fclose(file2);
+}
+
 int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
 	int aux;
 
 	if(partida->players[j].bola.cesto){
+		cestoAux(&partida->players[j], 1);
 		somaPontos(&partida->players[j],i,partida->players[j].bola.bonus);
 		partida->players[j].bola.bonus = 1;
 		if(partida->players[j].zona < 3)
@@ -655,26 +682,36 @@ int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
 		(*nFallos) = 0;
 		aux = 0;
 	}
-	else 
+	else{
+		cestoAux(&partida->players[j], 2);
 		(*nFallos)++;
 
-	if(k == partida->tentativas -1 || (*nFallos) > 1){
-		partida->players[j].bola.bonus = 0;
-		if(partida->players[j].zona > 1)
-			adaptaZona(&partida->players[j],&partida->campo,2);
-		else
-			adaptaZona(&partida->players[j],&partida->campo,3);
-		(*nFallos) = 0;
-		aux = 1;
+		if(k == partida->tentativas -1 || ((*nFallos)>0 && (*nFallos)%2 == 0)){
+			partida->players[j].bola.bonus = 0;
+			if(partida->players[j].zona > 1)
+				adaptaZona(&partida->players[j],&partida->campo,2);
+			else
+				adaptaZona(&partida->players[j],&partida->campo,3);
+			aux = 1;
+		}
+		else {
+			partida->players[j].bola.bonus = 0;
+			aux = 1;
+		}
+		
 	}
-	else {
-		partida->players[j].bola.bonus = 0;
-		aux = 1;
-	}
+	cesto();
+	system("pause");
+	system("cls");
+	
 
 	readCampo(&partida->campo);
+	int a;
 
-	addJugador(partida->players[j].posX,partida->players[j].posY,'0'+j+1,&partida->campo);	
+	for(a=0; a<partida->njogadores; a++){
+		addJugador(partida->players[a].posX,partida->players[a].posY,'0'+a+1,&partida->campo);	
+	}
+	
 
 	
 	return aux;
@@ -684,9 +721,10 @@ int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;
-	int nFallos = 0;
+	int nFallos;
 	for(i=0; i<partida->nRondas ; i++){
 		for(j=0; j<partida->njogadores;j++){
+			nFallos = 0;
 			aux = 1;
 			for(k=0; k<partida->tentativas  && aux; k++){
 				runRonda(partida,j,i,k,nFallos);
