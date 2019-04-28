@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+	<title>NBA2K19 BadEdition</title>
+	<link rel="shortcut icon" type="image/png" href="./favicon.png"/>
+	<style>
+		* {box-sizing: border-box;}
+
+		body { 
+		  margin: 0;
+		  font-family: Arial, Helvetica, sans-serif;
+		  background-color: #D5D5DF;
+		}
+
+		h1{
+			font-family: 'Karla', sans-serif;
+			font-size:40px;
+			font-style: bold;
+			text-align: center; 
+			text-shadow: 4px 4px 4px #aaa;
+		}
+
+		.cuadro {
+			background-color: #EEEE;
+			width: 50%;
+			margin: 30px auto;
+			padding: 15px 15px;
+			border-radius: 10px;
+			box-shadow: 0px 2px 20px rgba(173, 173, 173, 0.4);
+		}
+
+		.header {
+		  overflow: hidden;
+		  background-color: #424141;
+		  padding: 1.5% 1.5%;
+		  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
+		}
+
+		.header a {
+		  float: left;
+		  color: black;
+		  text-align: center;
+		  padding: 1%;
+		  text-decoration: none;	
+		  line-height: 25px;
+		  border-radius: 4px;
+		}
+
+		.header a:hover {
+		  background-color: #fffff;
+		  color: black;
+		}
+
+		.header a.logo{
+			position: relative;
+			left: 37.5%;
+			width: 25%; 
+			height: auto;
+		}
+
+		.header a.active {
+		  background-color: dodgerblue;
+		  color: white;
+		}
+
+		.header-right {
+		  float: right;
+		}
+
+		@media screen and (max-width: 500px) {
+		  .header a {
+		    float: none;
+		    display: block;
+		    text-align: left;
+		  }
+
+		  .header a.logo{
+			position: relative;
+			left: 0%;
+			width: 50%; 
+			height: auto;
+			}
+		  
+		  .header-right {
+		    float: none;
+		  }
+
+		h1{
+			font-family: 'Karla', sans-serif;
+			font-size: 20px;
+			font-style: bold;
+			text-align: center; 
+			text-shadow: 4px 4px 4px #aaa;
+			}
+		}
+		table{
+			border-spacing: 0px;
+			border-collapse: collapse;
+			width: 100%;
+			margin: 5px auto;
+		}
+		.cuadro{
+
+		}
+		th{
+			font-family: 'Karla', sans-serif;
+			font-size: 20px;
+			color: #373737;
+			border-right: 1px solid;
+			border-bottom: 1px solid;
+			text-align: center;
+			vertical-align: center;
+			border-color: #101010;
+			background-color: #E93C22;
+			padding: 10px;
+		}
+		td{
+			font-family: 'Karla', sans-serif;
+			font-size: 16px;
+			color: #808080;
+			padding: 10px;
+			border-right: 1px solid;
+			border-bottom: 1px solid;
+			border-color: #808080;
+			text-align: center;
+			vertical-align: center;
+		}
+
+</style>
+<script type="text/javascript" src="./database.json"></script>
+<link href="https://fonts.googleapis.com/css?family=Karla:400,700" rel="stylesheet">
+</head>
+<body>
+	<div class="header">
+	  <a href="#default" class="logo" ><img src="NBA_2K19_Logo.png" style="width: 100%; height: auto;" ></a>
+	</div>
+	<div class="cuadro">
+		<h1 class="h1">Statistics of the last game</h1>	
+		<div style="overflow-x:auto;" class = "tabla" id="div1">
+			<script type="text/javascript" src="js.js"></script>
+		</div>
+	</div>
+
+</body>
+</html>
