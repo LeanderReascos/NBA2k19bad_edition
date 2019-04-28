@@ -49,6 +49,9 @@ void readCampo(CAMPO *campo){
 	}
 	int i=0;
 	char buffer[219];
+	if(campo->campoDeJuego != NULL && campo->lin >0) {
+		freeCampo(campo);
+	}
 	campo->campoDeJuego = (char **) malloc(sizeof(char *));
 	if(campo->campoDeJuego == NULL){
 		printf("Error memoria 1\n");

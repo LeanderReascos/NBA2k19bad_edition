@@ -7,8 +7,10 @@ void novoJogador(){
  	float altura;
  	int n,i;
  	FILE *fp;
+ 	FILE *text;
  	fp=fopen("Base_de_datos/Jogadores.data","a");
-	if (fp==NULL)
+ 	text = fopen("Ficheiros_de_texto/Jogadores","a");
+	if (fp==NULL || text==NULL)
 		exit(-1);
 	
 	printf("How many players do you want to add? \n 	");
@@ -23,6 +25,7 @@ void novoJogador(){
      printf("What's your heigh? \n 	");
  	 scanf ("%f",&altura);
      fprintf(fp,"%s-%.2f\n", nome,altura); 
+     fprintf(text,"%s-%.2f\n", nome,altura); 
     }
 
 	fclose(fp);

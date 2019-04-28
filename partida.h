@@ -4,10 +4,15 @@
 #include "valoresLaunch.h"
 #include <math.h>
 #include <time.h>
+#include "settings.h"
 
 #define PI 3.14
 #define POSINICIO 3
-#define TENTATIVAS 5;
+
+#define CASUAL 1
+#define COMPETITIVE 2
+#define SUDDEN_DEATH 3
+
 
 typedef struct jogador{
 	//Base de datos
@@ -23,6 +28,7 @@ typedef struct jogador{
 	int numeroRondas;
 	int *pontosRondas;
 	int total;
+	int *fallos;
 }PLAYER;
 
 typedef struct partida{
@@ -33,6 +39,9 @@ typedef struct partida{
 	PLAYER *players;
 	CAMPO  campo;
 	int tentativas;
+
+	//settings
+	SETTINGS settings;
 	
 }PARTIDA;
 
@@ -46,6 +55,17 @@ typedef struct planeta{
 	
 }PLANETA;
 
+void setsDefault(PARTIDA *partida){
+	partida->settings.musica = true;
+	partida->settings.videos  = false;
+	partida->settings.animacion  = false;
+	partida->settings.gnuplot  = false;
+	partida->settings.velocidadeAnimacion = 3;
+	partida->settings.nR[0] = 3; //ronda casual
+	partida->settings.nR[1] = 1; //competitive
+	partida->settings.nT[0] = 1; //tentaitvas casual
+	partida->settings.nT[1] = 1; //tentativas competitive
+}
 
 void resultado(PLAYER *player){
 	int i;
@@ -69,7 +89,7 @@ void SomaRondas (PARTIDA* partida,int* n){
 	
 }
 
-int VeRondas(PARTIDA* partida)
+int VeRondas(PARTIDA* partida,int *lastronda)
 {
 	int res = 0;
 
@@ -98,14 +118,17 @@ int VeRondas(PARTIDA* partida)
 	
 	for(m=0;m<j;m++){
 		int aux = partida->players[jogadoresprimeiro[m]].numeroRondas;
+		(*lastronda) = aux;
 		partida->players[jogadoresprimeiro[m]].numeroRondas+=2;             			//////aumento do numero de rondas usando o vetor jogadoresprimeiro porque guarda os indices dos jogadores que estejam nesta situacao
 		partida->players[jogadoresprimeiro[m]].pontosRondas=(int*) realloc(partida->players[jogadoresprimeiro[m]].pontosRondas,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
+		partida->players[jogadoresprimeiro[m]].fallos=(int*) realloc(partida->players[jogadoresprimeiro[m]].fallos,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
 		res = 1;
-		if(partida->players[jogadoresprimeiro[m]].pontosRondas == NULL)
+		if(partida->players[jogadoresprimeiro[m]].pontosRondas == NULL || partida->players[jogadoresprimeiro[m]].fallos == NULL)
 				exit(-1);
 		int k;
 		for(k=0; k<2; k++){
 			partida->players[jogadoresprimeiro[m]].pontosRondas[aux+k] = 0;
+			partida->players[jogadoresprimeiro[m]].fallos[aux+k] = 0;
 		}
 	}
 
@@ -233,42 +256,50 @@ void readPlayer(PLAYER *player,int n){
 	}
 }
 
+
 void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 	int i,j;
 	partida->modoDeJogo=modoDeJogo;
 	
 	switch(modoDeJogo){
-		case (1):
+		case (CASUAL):
+			partida->tentativas = partida->settings.nT[CASUAL-1];
 			for(i=0;i<partida->njogadores;i++){
-				partida->players[i].numeroRondas=5;
-				partida->nRondas = 5;
-				partida->players[i].pontosRondas=(int*) malloc(5*sizeof(int));
+				partida->players[i].numeroRondas=	partida->settings.nR[CASUAL-1];
+				partida->nRondas = 	partida->settings.nR[CASUAL-1];
+				partida->players[i].pontosRondas=(int*) malloc(	partida->settings.nR[CASUAL-1]*sizeof(int));
+				partida->players[i].fallos=(int*) malloc(	partida->settings.nR[CASUAL-1]*sizeof(int));
 
 				for(j=0; j<partida->players[i].numeroRondas;j++){
 					partida->players[i].pontosRondas[j] = 0;
+					partida->players[i].fallos[j]= 0;
 				}
 			}
 			break;
-		case(2):
+		case(COMPETITIVE):
+			partida->tentativas = partida->settings.nT[COMPETITIVE-1];
 			for(i=0;i<partida->njogadores;i++){
-				partida->players[i].numeroRondas=1;
-				partida->nRondas = 1;
-				partida->players[i].pontosRondas=(int*) malloc(5*sizeof(int));
-
+				partida->players[i].numeroRondas=	partida->settings.nR[COMPETITIVE-1];
+				partida->nRondas = 	partida->settings.nR[COMPETITIVE-1];
+				partida->players[i].pontosRondas=(int*) malloc(	partida->settings.nR[COMPETITIVE-1]*sizeof(int));
+				partida->players[i].fallos=(int*) malloc(	partida->settings.nR[COMPETITIVE-1]*sizeof(int));
 				for(j=0; j<partida->players[i].numeroRondas;j++){
 					partida->players[i].pontosRondas[j] = 0;
+					partida->players[i].fallos[j]= 0;
 				}
 			}
 			break;
-		case(3):
+		case(SUDDEN_DEATH):
+			partida->tentativas = 1;
 			for(i=0;i<partida->njogadores;i++){
 				system("color 4f");
 				partida->players[i].numeroRondas=1;
 				partida->nRondas = 1;
 				partida->players[i].pontosRondas=(int*) malloc(sizeof(int));
-
+				partida->players[i].fallos=(int*) malloc(sizeof(int));
 				for(j=0; j<partida->players[i].numeroRondas;j++){
 					partida->players[i].pontosRondas[j] = 0;
+					partida->players[i].fallos[j]= 0;
 				}
 			}
 			break;
@@ -284,27 +315,43 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 
 }
 
+
 void freeMemoryPartida(PARTIDA *partida){
+	int i;
+	for(i=0; i < partida->njogadores; i++){
+		free(partida->players[i].name);
+		free(partida->players[i].pontosRondas);
+		free(partida->players[i].fallos);
+	}
+
 	free(partida->players);
-	free(partida);
 	freeCampo(&partida->campo);
+	free(partida);
 }
 
-void NEWGAME(PARTIDA *partidanova ,int opcao){
+void NEWGAME(PARTIDA *partidanova,int opcao){
 	srand((unsigned int)time(NULL));
-
 	partidanova->nPlaneta = opcao;
 	PLANETA* planeta;
 	planeta=(PLANETA*) malloc(sizeof(PLANETA));
 
 	if(planeta == NULL){
-		printf("Error memoria pleneta\n");
+		printf("Error memoria planeta\n");
 		exit(-1);
 	}
-
-	printf ("How many players will play this round?\n\t");
-	int nJugadores;
-	scanf("%d",&nJugadores);
+	//printf ("How many players will play this round?\n\t");
+	int nJugadores = 1;
+	//scanf("%d",&nJugadores);
+	int aux;
+	do{
+		system("cls");
+		printHeader();	
+		printtext(17,"Ficheiros_de_texto/subHeaders",7);
+		printtext(nJugadores+2,"Ficheiros_de_texto/numberSelect",8);
+		aux = selectNumber(&nJugadores);
+	}
+	while(aux != 0);
+	
 	partidanova->njogadores = nJugadores;
 
 	partidanova->players = (PLAYER *) malloc(partidanova->njogadores*sizeof(PLAYER));
@@ -355,13 +402,12 @@ void NEWGAME(PARTIDA *partidanova ,int opcao){
 				system("color 09");
 				break;
 	}
-	partidanova->tentativas = TENTATIVAS;
-
 	partidanova->campo.lChar=128;
 	partidanova->campo.aChar=50;
 	partidanova->campo.g=planeta->g;
 	partidanova->campo.ancho=planeta->acampo;
 	partidanova->campo.largo=planeta->lcampo;
+	partidanova->campo.lin=0;
 	strcpy(partidanova->campo.nome,planeta->nome);
 	strcpy(partidanova->campo.file,"Ficheiros_de_texto/campo");
 
@@ -430,7 +476,10 @@ void printPlayer(PLAYER *player){
 	printf("|   %.2f   ",player->altura);
 
 	for(i=0; i<player->numeroRondas;i++){
-		printf("|     %d     ",player->pontosRondas[i]);
+		if(player->pontosRondas[i]>0)
+			printf("|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]+1);
+		else
+			printf("|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]);
 	}
 	printf("|\n");
 }
@@ -440,29 +489,14 @@ void printEncabezado(int n){
 	int i;
 	printf("| No |          NAME          |  HEIGHT  |");
 	for(i=0; i<n;i++){
-		printf("  RONDA %d  |",i+1);
+		printf("  RONDA %d  |  TRY  |",i+1);
 	}
 	printf("\n");
-	for(i=0; i<42+12*n; i++){
+	for(i=0; i<42+21*n; i++){
 		printf("-");
 	}
 	printf("\n");
 }
-
-void printtext(int n,char file[100],int a){
-	FILE *fp;
-	fp = fopen(file,"r");
-	if(fp == NULL) exit(-1);
-
-	int i=0;
-	char buffer[160];
-	while(fgets(buffer,sizeof(buffer),fp) && i < n*a ){
-		if(i >= n*a-a)
-			printf("%s",buffer);
-		i++;
-	}
-}
-
 
 
 void printPartida(PARTIDA *partida){
@@ -511,7 +545,7 @@ void ordenar(PARTIDA *partida){
 }
 
 
-void infoprintPlayer(PLAYER *player,FILE *info){
+void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	int i;
 	int n = strlen(player->name);
 	fprintf(info,"|%s",player->name);
@@ -520,11 +554,29 @@ void infoprintPlayer(PLAYER *player,FILE *info){
 	}
 	fprintf(info,"|   %.2f   ",player->altura);
 
+	int intentos=0;
+	int fallos=0;
+	fprintf(json, "{\"name\":\"%s\", \"height\": %.2f,\"NumeroRondas\": %d,\"rondas\":[", player->name,player->altura,player->numeroRondas);
 	for(i=0; i<player->numeroRondas;i++){
-		fprintf(info,"|     %d     ",player->pontosRondas[i]);
+
+		if(player->pontosRondas[i]>0){
+			fprintf(info,"|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]+1);
+			intentos+=player->fallos[i]+1;
+		}
+		else{
+			fprintf(info,"|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]);
+			intentos+=player->fallos[i];
+		}	
+		fprintf(json, "{\"pontos\":%d,\"tentativas\":%d}",player->pontosRondas[i],player->fallos[i]);
+		
+		if(i<player->numeroRondas-1)
+			fprintf(json, "," );
+		fallos+=player->fallos[i];
 	}
-	fprintf(info,"|\n");
+	fprintf(json, "]}");
+	fprintf(info,"|   %.1f   |\n",((intentos-fallos)/intentos)*100);
 }
+
 
 void fprintText(int n,char file[100],int a, FILE *info){
 	FILE *fp;
@@ -547,49 +599,47 @@ void informacao(PARTIDA *partida){
 	scanf (" %[^\n]%*c", name);
 	strcat(name,".txt");
 
+	FILE *json;
+	json = fopen("Web/database.json","w");
+
 	FILE *information;
 	information = fopen(name,"w");
 
-	FILE *header;
-	header = fopen("Ficheiros_de_texto/header","r");
-	char buffer[250];
-	while(fgets(buffer,sizeof(buffer),header)){
-		fprintf(information, "%s",buffer);
-	}
-	fprintf(information, "\n\n\n\n\n");
+	if(json == NULL || information == NULL)
+		exit(-1);
 
-	fprintText(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16,information);
-	fprintf(information,"\n");
-	fprintText(partida->modoDeJogo,"Ficheiros_de_texto/modesVisual",7,information);
+	fprintText(1,"Ficheiros_de_texto/header",16,information);
 	fprintf(information,"\n\n\n");
 
 	int i;
 	int n=partida->nRondas;
 	fprintf(information,"| No |          NAME          |  HEIGHT  |");
 	for(i=0; i<n;i++){
-		fprintf(information,"  RONDA %d  |",i+1);
+		fprintf(information,"  RONDA %d  |  TRY  |",i+1);
 	}
-
-
+	fprintf(information,"  PTS%%  |");
 	fprintf(information,"\n");
-	for(i=0; i<42+12*n; i++){
+	for(i=0; i<42+21*n; i++){
 		fprintf(information,"-");
 	}
-	fprintf(information,"\n");
-
-
+	fprintf(information,"---------\n");
+	fprintf(json, "partidaValues = '{\"nr\":%d,\"nj\":%d,\"t\":%d}'\n",partida->nRondas,partida->njogadores,partida->tentativas);
+	fprintf(json, "data = '[");
 	for(i=0; i<partida->njogadores;i++){
 		if(i<9)
 			fprintf(information,"| %d  ",i+1);
 		else 
 			fprintf(information,"| %d ",i+1);
-		infoprintPlayer(&partida->players[i],information);
-	}
 
+
+		infoprintPlayer(&partida->players[i],information,partida->tentativas,json);
+		if(i<partida->njogadores-1)
+			fprintf(json, "," );
+	}
+	fprintf(json, "]'");
 	fprintf(information,"\n");
 
-
-	fclose(header);
+	fclose(json);
 	fclose(information);
 }
 
@@ -601,12 +651,24 @@ void cesto(){
             "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
         exit(0);
     }
-    fprintf(py, "exec(open('VIDEOS/video.py').read())");
+    fprintf(py, "exec(open('video.py').read())");
 
     fclose(py);
 }
 
-void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
+void exitGame(int v,PARTIDA *partida){
+	if(v == -10){
+		int x = mainSelect("leave");
+		if(x == 1){
+			informacao(partida);
+			exit(0);
+		}
+		else
+			system("cls");
+	}	
+}
+
+void runRonda(PARTIDA *partida, int j,int i, int k){
 	system("cls");
 	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
 	printf("\n");
@@ -614,6 +676,7 @@ void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
 	printf("\n\n\n");
 	printPartida(partida);
 	printf("\n\n");
+	printEncabezado(partida->nRondas);
 	if(j<9)
 		printf("| %d  ",j+1);
 	else 
@@ -621,19 +684,23 @@ void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
 	printPlayer(&partida->players[j]);
 	partida->players[j].bola.distCesto = distCesto(partida->players[j].posX,partida->players[j].posY,partida->campo.largo,partida->campo.ancho);
 	printf("\nVALUES: \n");
-	printf("\tTry number %d\n",k+1);
+	printf("\tROUND %d \\ Try number %d\n",i+1,k+1);
 	printf("\tDistance to the basket: %f\n", partida->players[j].bola.distCesto);
 	printf("\tJump Velocity: 0.00");
 	float v = velocidadeSalto(partida->players[j].altura,partida->campo.g);
+	exitGame(v,partida);
 	partida->players[j].bola.h0 =  pow(v,2)/(2*partida->campo.g) + partida->players[j].altura;
 	partida->players[j].bola.g = partida->campo.g;
 	printf("\n");
 	printf("\tLaunch Velocity: 1.00");
-	partida->players[j].bola.v = velocidadeLanzamento(20,partida->campo.g);
+	partida->players[j].bola.v = velocidadeLanzamento(partida->campo.g);
+	exitGame(partida->players[j].bola.v,partida);
 	printf("\n");
 	printf("\tLaunch Angle: 1.00");
-	partida->players[j].bola.ang = anguloLanzamento()*PI/180;
-	if(k == 0 || nFallos%2 == 0){
+	float ang = anguloLanzamento();
+	partida->players[j].bola.ang = ang*PI/180;
+	exitGame(ang,partida);
+	if(k == 0 || partida->players[j].fallos[i]%2 == 0){
 		switch(partida->players[j].zona){
 			case 1:
 					partida->players[j].bola.aux = 0;				
@@ -647,7 +714,11 @@ void runRonda(PARTIDA *partida, int j,int i, int k, int nFallos){
 		}
 		geraObstaculo(&partida->players[j].bola);
 	}
-	
+	//setting
+	partida->players[j].bola.gnu = partida->settings.gnuplot;
+	partida->players[j].bola.animacion = partida->settings.animacion;
+	partida->players[j].bola.vAni = partida->settings.velocidadeAnimacion;
+
 	parabola(&partida->players[j].bola);
 	system("pause");		
 			
@@ -667,9 +738,8 @@ void cestoAux(PLAYER *player, int n){
 	fclose(file2);
 }
 
-int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
+int confirmRonda(PARTIDA *partida, int j,int i){
 	int aux;
-
 	if(partida->players[j].bola.cesto){
 		cestoAux(&partida->players[j], 1);
 		somaPontos(&partida->players[j],i,partida->players[j].bola.bonus);
@@ -679,14 +749,13 @@ int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
 		else
 			adaptaZona(&partida->players[j],&partida->campo,3);
 
-		(*nFallos) = 0;
 		aux = 0;
 	}
 	else{
 		cestoAux(&partida->players[j], 2);
-		(*nFallos)++;
+		partida->players[j].fallos[i]++;
 
-		if(k == partida->tentativas -1 || ((*nFallos)>0 && (*nFallos)%2 == 0)){
+		if(partida->players[j].fallos[i] == partida->tentativas || partida->players[j].fallos[i]%2 == 0){
 			partida->players[j].bola.bonus = 0;
 			if(partida->players[j].zona > 1)
 				adaptaZona(&partida->players[j],&partida->campo,2);
@@ -700,10 +769,11 @@ int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
 		}
 		
 	}
-	cesto();
-	system("pause");
-	system("cls");
-	
+	if(partida->settings.videos){
+		cesto();
+		system("pause");
+		system("cls");
+	}
 
 	readCampo(&partida->campo);
 	int a;
@@ -717,31 +787,33 @@ int confirmRonda(PARTIDA *partida, int j,int i, int k, int *nFallos){
 	return aux;
 }
 
-
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;
-	int nFallos;
 	for(i=0; i<partida->nRondas ; i++){
 		for(j=0; j<partida->njogadores;j++){
-			nFallos = 0;
 			aux = 1;
 			for(k=0; k<partida->tentativas  && aux; k++){
-				runRonda(partida,j,i,k,nFallos);
-				aux = confirmRonda(partida,j,i,k,&nFallos);
+				runRonda(partida,j,i,k);
+				aux = confirmRonda(partida,j,i);
 				system("del obstaculo");
 				system("del parabola");
+				system("del cesto");
 			}
 		}
 	}
-	if(VeRondas(partida)){
+	int last;
+	if(VeRondas(partida,&last)){
 		printf("EMPATE\n");
 		printf("%d\n",partida->nRondas );
-		for(i=1; i<=partida->nRondas; i++){
+		for(i=last; i<partida->nRondas; i++){
 			for(j=0; j<partida->njogadores;j++){
 				for(k=0; k<partida->tentativas  && aux; k++){
-					runRonda(partida,j,i,k,nFallos);
-					aux = confirmRonda(partida,j,i,k,&nFallos);
+					runRonda(partida,j,i,k);
+					aux = confirmRonda(partida,j,i);
+					system("del obstaculo");
+					system("del parabola");
+					system("del cesto");
 				}	
 			}
 		}

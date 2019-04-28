@@ -40,6 +40,10 @@ typedef struct bola{
 	//Obstaculo
 	int aux;
 	OBSTACULO obstaculo;
+	//settings
+	int animacion;
+	int gnu;
+	float vAni;
 }BOLA;
 
 void freeMatriz(char **m,int lin){
@@ -100,8 +104,8 @@ void geraObstaculo(BOLA* bola){
 
 
 void verificaCesto(BOLA *bola){
-	int enX = bola->x < bola->distCesto+(diametroCesto/2) && bola->x > bola->distCesto-(diametroCesto/2);
-	int enY = bola->y < hCesto+(diametroCesto/2) && bola->y > hCesto-(diametroCesto/2);
+	int enX = bola->x <= bola->distCesto+(diametroCesto/2) && bola->x >= bola->distCesto-(diametroCesto/2);
+	int enY = bola->y <= hCesto+(diametroCesto/2) && bola->y >= hCesto-(diametroCesto/2);
 
 	int beY =  bola->y > hCesto;
 	//printf("X> %f EnX> %d EnY> %d BeY> %d Y> %f BEFORE> %d CESTO> %d\n",bola->x, enX,enY,beY,bola->y,enX && beY,enX && enY && bola->before);
@@ -275,7 +279,7 @@ void parabola(BOLA *bola){
 	 		bola->parabola[y][x]='@'; 
 	 	}
 
-	 	if(t-dt >= 0.03){
+	 	if(t-dt >= 0.01*bola->vAni && bola->x<=bola->distCesto && bola->animacion){
 	 		printMatriz(bola->parabola,sizeLinhas,sizeColumnas);
 	 		dt = t;
 	 	}
@@ -293,7 +297,8 @@ void parabola(BOLA *bola){
 	 }
 
 	 fclose(fp);
-	 printParabola(bola);
+	 if(bola->gnu)
+	 	printParabola(bola);	
 	
 	freeMatriz(bola->parabola,sizeLinhas);
 

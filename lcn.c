@@ -7,14 +7,15 @@
 #include "instrucciones.h"
 
 #define NUEVOJUEGO 1
-#define EXIT 4
+#define EXIT 5
 #define NEWPLAYER 2
 #define INSTRUCCIONES 3
+#define SETTINGS 4
 
 void adicionarjugadores(PARTIDA *partida){
 	int i,x;
 	for(i=0; i<partida->njogadores; i++){
-		x = mainSelect("Base_de_datos/Jogadores.data");
+		x = valueSelect("Jogadores");
 		if(x != 0){
 			readPlayer(&partida->players[i],x);
 		}
@@ -38,10 +39,11 @@ void openMusic(){
             "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
         exit(0);
     }
-    fprintf(py, "exec(open('MUSICAS/game.py').read())");
+    fprintf(py, "exec(open('game.py').read())");
 
     fclose(py);
 }
+
 
 int main(int argc, char const *argv[])
 {
@@ -49,21 +51,32 @@ int main(int argc, char const *argv[])
 
 	int op,x;
 	PARTIDA *partida = (PARTIDA*) malloc(sizeof(PARTIDA)); 
+	if(partida == NULL) exit(-1);
+	setsDefault(partida);
+
 	do{
-		op = mainSelect("Ficheiros_de_texto/main");
+		op = mainSelect("main");
 		switch(op){
+			case SETTINGS:
+				do{
+					x = mainSelect("settings");
+					segundoMenu(x,&partida->settings);
+				}
+				while(x != 0);
+				break;
 			case INSTRUCCIONES:
 				instructions();
 				break;
 			case NUEVOJUEGO:
-				x = mainSelect("Ficheiros_de_texto/planets");
+
+				x = valueSelect("planets");
 				system("cls");
 				printHeader();
 				printf("\n\n\n");
 				NEWGAME(partida,x);
 				adicionarjugadores(partida);
 				if(partida->njogadores > 1)
-					x = mainSelect("Ficheiros_de_texto/mode");
+					x = valueSelect("mode");
 				else
 					x = 1;
 				seleccionarModoDeJogo(partida,x);
@@ -89,7 +102,7 @@ int main(int argc, char const *argv[])
 		}	
 		
 	}
-	while(op != 0 && op!=4 );
+	while(op != 0 && op!=EXIT );
 	
 	return 0;
 }
