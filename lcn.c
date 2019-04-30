@@ -26,7 +26,7 @@ void openMusic(){
 	FILE * file;
 	file=fopen("MUSICAS/.commands","w");
 	if(file==NULL){
-		printf("nao abriu commands\n");
+		printf("Commands didn't open'\n");
 		exit(-1);
 	}
 	fprintf(file, "play");
@@ -35,8 +35,8 @@ void openMusic(){
 	FILE *py;
     py = popen("py", "w");
     if (py == NULL) {
-        printf("Erro ao abrir pipe para o python.\n"
-            "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
+        printf("Error opening pipe to python.\n" 
+            "This program needs python to function fully, please install it.\n");  
         exit(0);
     }
     fprintf(py, "exec(open('game.py').read())");

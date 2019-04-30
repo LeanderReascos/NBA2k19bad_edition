@@ -21,8 +21,8 @@ typedef struct opciones{
 	BOOL animacion;
 	BOOL gnuplot;
 	float velocidadeAnimacion;
-	int nR[3];
-	int nT[3];
+	int nR[2];
+	int nT[2];
 }SETTINGS;
 
 int select(){
@@ -148,7 +148,7 @@ void selectMenu(int n,int v[]){
 				printHeader();
 				printtext(SUDDEN_DEATH,"Ficheiros_de_texto/modesVisual",7);
 				printtext(a,"Ficheiros_de_texto/numberSelect",8);
-				printf("\n\tno se puede cambiar\n");
+				printf("\n\tno can't be changed'\n");
 				break;
 		}
 	}

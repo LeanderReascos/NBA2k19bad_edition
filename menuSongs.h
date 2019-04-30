@@ -7,7 +7,7 @@ int leCommand(FILE * file){
 
 	char buffer [20];
 	if(file==NULL){
-		printf("nao abriu commands\n");
+		printf("Commands didn't open'\n");
 		exit(-1);
 	  }
 	fgets(buffer,sizeof(buffer),file);
@@ -25,7 +25,7 @@ void Musica(char letra){
 	FILE * file2;
 	file2=fopen("MUSICAS/.commands","r");
 	if(file2==NULL){
-		printf("nao abriu commands\n");
+		printf("Commands didn't open'\n");
 		//exit(-1);
 	}
 	switch (letra){
