@@ -12,6 +12,8 @@
 #define CASUAL 1
 #define COMPETITIVE 2
 #define SUDDEN_DEATH 3
+#define MINIMO 1
+
 
 
 typedef struct jogador{
@@ -31,6 +33,7 @@ typedef struct jogador{
 	int *fallos;
 	int *tentativas;
 	int *cestos;
+	int frep;                             //////////////////////////    //////////DIFERENCA
 }PLAYER;
 
 typedef struct partida{
@@ -236,6 +239,59 @@ void gerarPosicoes(PLAYER* jogador,CAMPO* campo,int n){
 
 
 
+
+
+
+void PrimeiraTentativa (PARTIDA* partida,int ronda){                           ///////////////////////////////////////    //////////DIFERENCA
+	int i;
+switch(ronda){
+	case 1:
+			gerarPosicoes(&partida->players[0],&partida->campo,1);
+	for(i=0; i<partida->njogadores; i++){
+		partida->players[i].bola.bonus = 0;
+		partida->players[i].zona = 1;
+		partida->players[i].posX = partida->players[0].posX;
+		partida->players[i].posY = partida->players[0].posY;
+		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
+	}
+		
+		break;
+	case 2:
+			gerarPosicoes(&partida->players[0],&partida->campo,2);
+	for(i=0; i<partida->njogadores; i++){
+		partida->players[i].bola.bonus = 0;
+		partida->players[i].zona = 2;
+		partida->players[i].posX = partida->players[0].posX;
+		partida->players[i].posY = partida->players[0].posY;
+		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
+	}
+		break;
+	default:
+			gerarPosicoes(&partida->players[0],&partida->campo,3);
+	for(i=0; i<partida->njogadores; i++){
+		partida->players[i].bola.bonus = 0;
+		partida->players[i].zona = 3;
+		partida->players[i].posX = partida->players[0].posX;
+		partida->players[i].posY = partida->players[0].posY;
+		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
+	}
+		break;
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 void readPlayer(PLAYER *player,int n){
 	int i = 0,j;
 	FILE *fp;
@@ -302,14 +358,7 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 		}
 	}
 
-	gerarPosicoes(&partida->players[0],&partida->campo,POSINICIO);
-	for(i=0; i<partida->njogadores; i++){
-		partida->players[i].bola.bonus = 0;
-		partida->players[i].zona = POSINICIO;
-		partida->players[i].posX = partida->players[0].posX;
-		partida->players[i].posY = partida->players[0].posY;
-		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
-	}
+PrimeiraTentativa(partida,1);                                                         ///////////////////////    //////////DIFERENCA
 
 }
 
@@ -430,7 +479,7 @@ void somaPontos(PLAYER * player,int n,int aux){
 				player->pontosRondas[n]+=2;
 			
 			else if(aux==1)
-				player->pontosRondas[n]+=3;
+				player->pontosRondas[n]+=4;
 			
 			break;	
 		case 3:
@@ -438,27 +487,56 @@ void somaPontos(PLAYER * player,int n,int aux){
 				player->pontosRondas[n]+=3;
 				
 			else if(aux==1)
-				player->pontosRondas[n]+=4;
+				player->pontosRondas[n]+=6;
 		break;
 	}
 }
 
-void adaptaZona(PLAYER* player,CAMPO* campo, int n){
+void adaptaZona(PLAYER* player,CAMPO* campo, int n){                                                           ///////////////////////////////////////////////DIFERENCA
+float distatual2=14;
+float distatual1=0.0;
+float distoriginal=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+float MAXIMO =sqrt(pow(campo->ancho,2)+pow(campo->largo,2));
+////////////////SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L^2+C^2)
+////////////////SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MINIMO=1
+
 	switch(n){
 
-		case 1:
+		case 1:                                                        ///////////////////////ZONA MAIS LONGE- USADA PARA A QUANDO MARCA PONTO
 			gerarPosicoes(player,campo,player->zona+1);
 			player->zona++;
 		break;
 
-		case 2:
+		case 2:                                            ///////////////////////ZONA MAIS PERTO- USADA PARA A QUANDO PERDE DUAS VEZES SEGUIDAS
 			gerarPosicoes(player,campo,player->zona-1);
 			player->zona--;
 		break;	
 
-		case 3:
-			gerarPosicoes(player,campo,player->zona);
-		break;	
+
+
+		case 3:                                       ///////////////////////MESMA ZONA MAS MAIS LONGE- USADA PARA QUANDO ESTA  NA ZONA 3 E ACERTA
+			if(distoriginal<=MAXIMO-campo->ancho*0.02) 
+			break;
+			
+			else{
+			while (distatual1<=distoriginal ){           
+			gerarPosicoes(player,campo,player->zona); 
+			distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+			}    
+			
+			break;	}
+		
+		
+		
+		case 4:                                        ///////////////////////MESMA ZONA MAS MAIS PERTO- USADA PARA A ZONA 1
+		if(distoriginal<=MINIMO+0.2) 
+			break;
+		
+		else{
+			while (distatual2>=distoriginal  && distatual2!=MINIMO){
+			gerarPosicoes(player,campo,player->zona);      
+			distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);}
+		break;}
 
 
 	}
@@ -727,6 +805,26 @@ void cestoAux(PLAYER *player, int n){
 	fclose(file2);
 }
 
+
+
+
+
+
+
+void poeZeros(PARTIDA* partida){                                         //////////DIFERENCA
+	int i;
+	for(i=0;i<partida->njogadores;i++){
+		partida->players[i].frep=0;
+		
+	}
+	
+	
+	
+}
+
+
+
+
 int confirmRonda(PARTIDA *partida, int j,int i){
 	int aux = 1;
 	if(partida->players[j].bola.cesto){
@@ -740,20 +838,23 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 			adaptaZona(&partida->players[j],&partida->campo,3);
 		if(partida->modoDeJogo == SUDDEN_DEATH)
 			aux = 0;
+		partida->players[j].frep=0;                                                                                                                           //////////DIFERENCA
 	}
 	else{
 		cestoAux(&partida->players[j], 2);
 		partida->players[j].fallos[i]++;
 
-		if(partida->players[j].fallos[i] == partida->tentativas || partida->players[j].fallos[i]%2 == 0){
-			partida->players[j].bola.bonus = 0;
+		if(partida->players[j].frep==1/*partida->players[j].fallos[i] == partida->tentativas || partida->players[j].fallos[i]%2 == 0*/){               //////////DIFERENCA
+			partida->players[j].bola.bonus = 0;   
 			if(partida->players[j].zona > 1)
 				adaptaZona(&partida->players[j],&partida->campo,2);
 			else
-				adaptaZona(&partida->players[j],&partida->campo,3);
+				adaptaZona(&partida->players[j],&partida->campo,4);                                                                                               //////////DIFERENCA
+			partida->players[j].frep=0;
 		}
 		else {
 			partida->players[j].bola.bonus = 0;
+			partida->players[j].frep++;                                                                                                                             //////////DIFERENCA
 		}
 		
 	}
@@ -868,12 +969,14 @@ void listaMelhores(PARTIDA* partida){
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;
-	int last,nP;
+	int last,nP,zona;
 	if(partida->modoDeJogo == SUDDEN_DEATH){
 		aux = 1;
 		k = 0;
-		while(aux){
-			i = 0;
+		while(aux){                                                           //////////DIFERENCA
+			zona=1+rand()%2;                                                      //////////DIFERENCA
+			i = 0;                                                            //////////DIFERENCA
+			PrimeiraTentativa(partida,zona);
 			for(j=0; j<partida->njogadores && aux;j++){
 				runRonda(partida,j,i,k);
 				aux = confirmRonda(partida,j,i);
@@ -889,6 +992,9 @@ void playGame(PARTIDA *partida){
 	}
 	else{
 		for(i=0; i<partida->nRondas ; i++){
+			if (i>0)
+					PrimeiraTentativa(partida,i+1);                                        //////////DIFERENCA
+					poeZeros(partida);                                                         //////////DIFERENCA
 			for(j=0; j<partida->njogadores;j++){
 				aux = 1;
 				for(k=0; k<partida->tentativas && aux; k++){
@@ -923,6 +1029,7 @@ void playGame(PARTIDA *partida){
 	ordenar(partida);
 	system("pause");
 	informacao(partida);
+	system("pause");
 	listaMelhores(partida);
-	system("start Web/index.htm")
+	system("start Web/index.htm");
 }
