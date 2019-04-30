@@ -21,8 +21,8 @@ typedef struct opciones{
 	BOOL animacion;
 	BOOL gnuplot;
 	float velocidadeAnimacion;
-	int nR[2];
-	int nT[2];
+	int nR[3];
+	int nT[3];
 }SETTINGS;
 
 int select(){

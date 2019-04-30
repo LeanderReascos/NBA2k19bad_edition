@@ -29,6 +29,8 @@ typedef struct jogador{
 	int *pontosRondas;
 	int total;
 	int *fallos;
+	int *tentativas;
+	int *cestos;
 }PLAYER;
 
 typedef struct partida{
@@ -56,15 +58,17 @@ typedef struct planeta{
 }PLANETA;
 
 void setsDefault(PARTIDA *partida){
-	partida->settings.musica = true;
+	partida->settings.musica = false;
 	partida->settings.videos  = false;
 	partida->settings.animacion  = false;
-	partida->settings.gnuplot  = false;
+	partida->settings.gnuplot  = true;
 	partida->settings.velocidadeAnimacion = 3;
 	partida->settings.nR[0] = 3; //ronda casual
 	partida->settings.nR[1] = 1; //competitive
-	partida->settings.nT[0] = 1; //tentaitvas casual
+	partida->settings.nR[2] = 1; //muerte subita
+	partida->settings.nT[0] = 3; //tentaitvas casual
 	partida->settings.nT[1] = 1; //tentativas competitive
+	partida->settings.nT[1] = 1; //muerteSubita
 }
 
 void resultado(PLAYER *player){
@@ -89,10 +93,10 @@ void SomaRondas (PARTIDA* partida,int* n){
 	
 }
 
-int VeRondas(PARTIDA* partida,int *lastronda)
+int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 {
 	int res = 0;
-
+	(*np) = 0;
 	int i,j=1,m;
 	int* n=(int*) malloc(sizeof(int)*(partida->njogadores));            				/////array das somas dos pontos dos jogadores por ordem de como os proprios estao organizados
 	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontuaÃ§ao
@@ -116,24 +120,29 @@ int VeRondas(PARTIDA* partida,int *lastronda)
 	}	
 	if(partida->modoDeJogo==2 && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontuaÃ§ao
 	
-	for(m=0;m<j;m++){
-		int aux = partida->players[jogadoresprimeiro[m]].numeroRondas;
-		(*lastronda) = aux;
-		partida->players[jogadoresprimeiro[m]].numeroRondas+=2;             			//////aumento do numero de rondas usando o vetor jogadoresprimeiro porque guarda os indices dos jogadores que estejam nesta situacao
-		partida->players[jogadoresprimeiro[m]].pontosRondas=(int*) realloc(partida->players[jogadoresprimeiro[m]].pontosRondas,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
-		partida->players[jogadoresprimeiro[m]].fallos=(int*) realloc(partida->players[jogadoresprimeiro[m]].fallos,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
-		res = 1;
-		if(partida->players[jogadoresprimeiro[m]].pontosRondas == NULL || partida->players[jogadoresprimeiro[m]].fallos == NULL)
-				exit(-1);
-		int k;
-		for(k=0; k<2; k++){
-			partida->players[jogadoresprimeiro[m]].pontosRondas[aux+k] = 0;
-			partida->players[jogadoresprimeiro[m]].fallos[aux+k] = 0;
+		for(m=0;m<j;m++){
+			int aux = partida->players[jogadoresprimeiro[m]].numeroRondas;
+			(*lastronda) = aux;
+
+			partida->players[jogadoresprimeiro[m]].numeroRondas+=extras;             			//////aumento do numero de rondas usando o vetor jogadoresprimeiro porque guarda os indices dos jogadores que estejam nesta situacao
+			partida->players[jogadoresprimeiro[m]].pontosRondas=(int*) realloc(partida->players[jogadoresprimeiro[m]].pontosRondas,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
+			partida->players[jogadoresprimeiro[m]].fallos=(int*) realloc(partida->players[jogadoresprimeiro[m]].fallos,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
+			partida->players[jogadoresprimeiro[m]].cestos=(int*) realloc(partida->players[jogadoresprimeiro[m]].cestos,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
+			partida->players[jogadoresprimeiro[m]].tentativas=(int*) realloc(partida->players[jogadoresprimeiro[m]].tentativas,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
+			res = 1;
+			if(partida->players[jogadoresprimeiro[m]].pontosRondas == NULL || partida->players[jogadoresprimeiro[m]].fallos == NULL)
+					exit(-1);
+			int k;
+			for(k=0; k<extras; k++){
+				partida->players[jogadoresprimeiro[m]].pontosRondas[aux+k] = 0;
+				partida->players[jogadoresprimeiro[m]].fallos[aux+k] = 0;
+				partida->players[jogadoresprimeiro[m]].cestos[aux+k] = 0;
+				partida->players[jogadoresprimeiro[m]].tentativas[aux+k] = 0;
+			}
 		}
-	}
 
 	}
-	
+	(*np) = j;
 	free(n);
 	free(jogadoresprimeiro);
 	if(res)			partida->nRondas+=2;  
@@ -261,49 +270,38 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 	int i,j;
 	partida->modoDeJogo=modoDeJogo;
 	
+	int n;
+
+
 	switch(modoDeJogo){
 		case (CASUAL):
-			partida->tentativas = partida->settings.nT[CASUAL-1];
-			for(i=0;i<partida->njogadores;i++){
-				partida->players[i].numeroRondas=	partida->settings.nR[CASUAL-1];
-				partida->nRondas = 	partida->settings.nR[CASUAL-1];
-				partida->players[i].pontosRondas=(int*) malloc(	partida->settings.nR[CASUAL-1]*sizeof(int));
-				partida->players[i].fallos=(int*) malloc(	partida->settings.nR[CASUAL-1]*sizeof(int));
-
-				for(j=0; j<partida->players[i].numeroRondas;j++){
-					partida->players[i].pontosRondas[j] = 0;
-					partida->players[i].fallos[j]= 0;
-				}
-			}
+			n = CASUAL-1;
 			break;
 		case(COMPETITIVE):
-			partida->tentativas = partida->settings.nT[COMPETITIVE-1];
-			for(i=0;i<partida->njogadores;i++){
-				partida->players[i].numeroRondas=	partida->settings.nR[COMPETITIVE-1];
-				partida->nRondas = 	partida->settings.nR[COMPETITIVE-1];
-				partida->players[i].pontosRondas=(int*) malloc(	partida->settings.nR[COMPETITIVE-1]*sizeof(int));
-				partida->players[i].fallos=(int*) malloc(	partida->settings.nR[COMPETITIVE-1]*sizeof(int));
-				for(j=0; j<partida->players[i].numeroRondas;j++){
-					partida->players[i].pontosRondas[j] = 0;
-					partida->players[i].fallos[j]= 0;
-				}
-			}
+			n = COMPETITIVE -1;
 			break;
 		case(SUDDEN_DEATH):
-			partida->tentativas = 1;
-			for(i=0;i<partida->njogadores;i++){
-				system("color 4f");
-				partida->players[i].numeroRondas=1;
-				partida->nRondas = 1;
-				partida->players[i].pontosRondas=(int*) malloc(sizeof(int));
-				partida->players[i].fallos=(int*) malloc(sizeof(int));
-				for(j=0; j<partida->players[i].numeroRondas;j++){
-					partida->players[i].pontosRondas[j] = 0;
-					partida->players[i].fallos[j]= 0;
-				}
-			}
+			system("color 4f");
+			n = SUDDEN_DEATH-1;
 			break;
 	}
+
+	partida->tentativas = partida->settings.nT[n];
+	for(i=0;i<partida->njogadores;i++){
+		partida->players[i].numeroRondas=	partida->settings.nR[n];
+		partida->nRondas = 	partida->settings.nR[n];
+		partida->players[i].pontosRondas=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		partida->players[i].fallos=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		partida->players[i].cestos=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		partida->players[i].tentativas=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		for(j=0; j<partida->players[i].numeroRondas;j++){
+			partida->players[i].pontosRondas[j] = 0;
+			partida->players[i].fallos[j]= 0;
+			partida->players[i].cestos[j]= 0;
+			partida->players[i].tentativas[j]= 0;
+		}
+	}
+
 	gerarPosicoes(&partida->players[0],&partida->campo,POSINICIO);
 	for(i=0; i<partida->njogadores; i++){
 		partida->players[i].bola.bonus = 0;
@@ -476,10 +474,7 @@ void printPlayer(PLAYER *player){
 	printf("|   %.2f   ",player->altura);
 
 	for(i=0; i<player->numeroRondas;i++){
-		if(player->pontosRondas[i]>0)
-			printf("|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]+1);
-		else
-			printf("|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]);
+		printf("|     %d     |   %d   ",player->pontosRondas[i],player->tentativas[i]);		
 	}
 	printf("|\n");
 }
@@ -555,26 +550,20 @@ void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	fprintf(info,"|   %.2f   ",player->altura);
 
 	int intentos=0;
-	int fallos=0;
+	int cestos=0;
 	fprintf(json, "{\"name\":\"%s\", \"height\": %.2f,\"NumeroRondas\": %d,\"rondas\":[", player->name,player->altura,player->numeroRondas);
 	for(i=0; i<player->numeroRondas;i++){
-
-		if(player->pontosRondas[i]>0){
-			fprintf(info,"|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]+1);
-			intentos+=player->fallos[i]+1;
-		}
-		else{
-			fprintf(info,"|     %d     |   %d   ",player->pontosRondas[i],player->fallos[i]);
-			intentos+=player->fallos[i];
-		}	
-		fprintf(json, "{\"pontos\":%d,\"tentativas\":%d}",player->pontosRondas[i],player->fallos[i]);
+		fprintf(info,"|     %d     |   %d   ",player->pontosRondas[i],player->tentativas[i]);
+		fprintf(json, "{\"pontos\":%d,\"tentativas\":%d,\"cestos\":%d}",player->pontosRondas[i],player->tentativas[i],player->cestos[i]);
 		
 		if(i<player->numeroRondas-1)
 			fprintf(json, "," );
-		fallos+=player->fallos[i];
+		intentos+=player->tentativas[i];
+		cestos+=player->cestos[i];
 	}
+	float per = (float)cestos/(float)intentos;
 	fprintf(json, "]}");
-	fprintf(info,"|   %.1f   |\n",((intentos-fallos)/intentos)*100);
+	fprintf(info,"|   %.1f   |\n",per*100);
 }
 
 
@@ -684,7 +673,7 @@ void runRonda(PARTIDA *partida, int j,int i, int k){
 	printPlayer(&partida->players[j]);
 	partida->players[j].bola.distCesto = distCesto(partida->players[j].posX,partida->players[j].posY,partida->campo.largo,partida->campo.ancho);
 	printf("\nVALUES: \n");
-	printf("\tROUND %d \\ Try number %d\n",i+1,k+1);
+	printf("\tROUND %d \\ Try number %d\\N Cestos: %d\\Bonus: %d\n",i+1,k+1,partida->players[j].cestos[i],partida->players[j].bola.bonus);
 	printf("\tDistance to the basket: %f\n", partida->players[j].bola.distCesto);
 	printf("\tJump Velocity: 0.00");
 	float v = velocidadeSalto(partida->players[j].altura,partida->campo.g);
@@ -739,8 +728,9 @@ void cestoAux(PLAYER *player, int n){
 }
 
 int confirmRonda(PARTIDA *partida, int j,int i){
-	int aux;
+	int aux = 1;
 	if(partida->players[j].bola.cesto){
+		partida->players[j].cestos[i]++;
 		cestoAux(&partida->players[j], 1);
 		somaPontos(&partida->players[j],i,partida->players[j].bola.bonus);
 		partida->players[j].bola.bonus = 1;
@@ -748,8 +738,8 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 			adaptaZona(&partida->players[j],&partida->campo,1);
 		else
 			adaptaZona(&partida->players[j],&partida->campo,3);
-
-		aux = 0;
+		if(partida->modoDeJogo == SUDDEN_DEATH)
+			aux = 0;
 	}
 	else{
 		cestoAux(&partida->players[j], 2);
@@ -761,11 +751,9 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 				adaptaZona(&partida->players[j],&partida->campo,2);
 			else
 				adaptaZona(&partida->players[j],&partida->campo,3);
-			aux = 1;
 		}
 		else {
 			partida->players[j].bola.bonus = 0;
-			aux = 1;
 		}
 		
 	}
@@ -787,38 +775,154 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 	return aux;
 }
 
+
+typedef struct VENCEDOR{
+	char nome[30];
+	int pontuacao;
+}VENCEDOR;
+
+
+
+
+void listaMelhores(PARTIDA* partida){
+	VENCEDOR * lista=NULL;
+	int contador;
+	int conseguiu=0,m,j,j2,i2;
+
+	FILE * fp2=fopen("Base_de_datos\\HIGHSCORES.data","r");
+	if (fp2==NULL) exit(-1);
+		
+	int i;
+	contador=0;
+	
+	char buffer[40];
+	char* partes;
+
+	lista=(VENCEDOR*) malloc(sizeof(VENCEDOR));              
+	while(fgets(buffer,sizeof(buffer),fp2)){
+		(contador)++;
+		lista=(VENCEDOR*) realloc(lista,(contador)*sizeof(VENCEDOR));
+		partes=strtok(buffer,";");
+		i=1;
+		while (partes!=NULL){
+			switch(i){
+				case 1:
+					strcpy(lista[(contador)-1].nome,partes);
+					break;
+				case 2:
+					lista[(contador)-1].pontuacao=atoi(partes);
+					break;
+			}
+			partes=strtok(NULL,";");
+			i++;
+		}
+	}
+		fclose(fp2);
+		
+	int* n=(int*) malloc(partida->njogadores*sizeof(int));    
+	int tamanho=contador,conseguiu2;          
+	SomaRondas(partida,n);
+
+	for(i2=0;i2<partida->njogadores;i2++){
+		conseguiu2=0;
+		for(j=0;j<(contador) && conseguiu2==0;j++){
+			if(n[i2]>=lista[j].pontuacao && n[i2]!=0 ){
+				conseguiu2=1;
+				conseguiu=1;
+				for(j2=(contador)-1;j2>j;j2--){                              ////////////repreencher lista dos vencedores- eliminando o ultimo .E indo passando o "ultimo" atual para a posicao seguinte
+					strcpy(lista[j2].nome,lista[j2-1].nome);
+					lista[j2].pontuacao=lista[j2-1].pontuacao;	
+				}
+				strcpy(lista[j].nome,partida->players[i2].name);
+				lista[j].pontuacao=n[i2];
+				tamanho=5;
+			}	
+		}
+	}
+	free(n);	
+	
+	FILE * fp=fopen("Base_de_datos/HIGHSCORES.data","r+");
+	if (fp==NULL) exit(-1);	
+	FILE *json = fopen("Web/highscores.json","w");
+	if (conseguiu==1){                ///////CASO HAJA ALTERACOES, DÁ-SE A NOTICIA MOSTRANDO A "TABELA"               
+		system("cls");          
+		printHeader();
+		prints("Ficheiros_de_texto/CONGRATULATIONS.txt");
+		fprintf(json, "highscores= '[" );
+		for	(m=0;m<(tamanho);m++){
+			fprintf(fp,"%s;%d;\n",lista[m].nome,lista[m].pontuacao);
+			fprintf(json, "{\"name\":\"%s\", \"pontos\": %d}", lista[m].nome,lista[m].pontuacao);
+			printf("\n\n\t\t\t\t\t\t\t\t%d. %s->%d\n",m+1,lista[m].nome,lista[m].pontuacao);
+			if(m != tamanho-1)
+				fprintf(json, ",");
+		}
+		fprintf(json, "]'");
+	}
+
+	free(lista);
+	fclose(fp);
+	fclose(json);
+	system("pause");
+}
+
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;
-	for(i=0; i<partida->nRondas ; i++){
-		for(j=0; j<partida->njogadores;j++){
-			aux = 1;
-			for(k=0; k<partida->tentativas  && aux; k++){
+	int last,nP;
+	if(partida->modoDeJogo == SUDDEN_DEATH){
+		aux = 1;
+		k = 0;
+		while(aux){
+			i = 0;
+			for(j=0; j<partida->njogadores && aux;j++){
 				runRonda(partida,j,i,k);
 				aux = confirmRonda(partida,j,i);
+				partida->players[j].tentativas[i]++;
 				system("del obstaculo");
 				system("del parabola");
 				system("del cesto");
+				if(aux)
+					VeRondas(partida,&last,&nP,1);
 			}
+			k++;
 		}
 	}
-	int last;
-	if(VeRondas(partida,&last)){
-		printf("EMPATE\n");
-		printf("%d\n",partida->nRondas );
-		for(i=last; i<partida->nRondas; i++){
+	else{
+		for(i=0; i<partida->nRondas ; i++){
 			for(j=0; j<partida->njogadores;j++){
-				for(k=0; k<partida->tentativas  && aux; k++){
+				aux = 1;
+				for(k=0; k<partida->tentativas && aux; k++){
 					runRonda(partida,j,i,k);
 					aux = confirmRonda(partida,j,i);
+					partida->players[j].tentativas[i]++;
 					system("del obstaculo");
 					system("del parabola");
 					system("del cesto");
-				}	
+				}
+			}
+		}
+		
+		if(VeRondas(partida,&last,&nP,2)){
+			printf("EMPATE\n");
+			printf("%d\n",partida->nRondas );
+			for(i=last; i<partida->nRondas; i++){
+				for(j=0; j<nP;j++){
+					for(k=0; k<partida->tentativas  && aux; k++){
+						runRonda(partida,j,i,k);
+						aux = confirmRonda(partida,j,i);
+						partida->players[j].tentativas[i]++;
+						system("del obstaculo");
+						system("del parabola");
+						system("del cesto");
+					}	
+				}
 			}
 		}
 	}
+	
 	ordenar(partida);
 	system("pause");
 	informacao(partida);
+	listaMelhores(partida);
+	system("start Web/index.htm")
 }

@@ -4,6 +4,18 @@
 
 #define PATH "Ficheiros_de_texto/"
 
+
+void prints(char nome[]){                       ///////////print da pergunta
+  FILE *fp;
+  fp = fopen(nome,"r");
+  if(fp == NULL) exit(-1);
+  char buffer[100];
+  while(fgets(buffer,sizeof(buffer),fp)){
+    printf("%s",buffer);
+  }
+  fclose(fp);
+}
+
 void freeMemoryMain(char **main, int n){
   int i;
   for(i=0; i<n;i++){
