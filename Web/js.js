@@ -4,78 +4,65 @@ var aux = JSON.parse(partidaValues);
 var tabla   = document.createElement('table');
 	var tblBody = document.createElement('tbody');
 
-	var hilera1 = document.createElement("tr");
+	var fila = document.createElement("tr");
+  	var columna = document.createElement("th");
+	columna.appendChild(document.createTextNode("NAME"));
+	fila.appendChild(columna);
+	columna = document.createElement("th");
+	columna.appendChild(document.createTextNode("HEIGHT"));
+	fila.appendChild(columna);
 
+	for(var i = 1; i <= aux.nr;i++){
+		columna = document.createElement("th");
+	    columna.appendChild(document.createTextNode("RONDA N"+i));
+	    fila.appendChild(columna);
+	    columna = document.createElement("th");
+	    columna.appendChild(document.createTextNode("TRY"));
+	    fila.appendChild(columna);
+	}
 
-	 var nome1 = document.createElement("th");
-	 nome1.appendChild(document.createTextNode("NAME"));
-	 hilera1.appendChild(nome1);
-	 var altura1 = document.createElement("th");
-	 altura1.appendChild(document.createTextNode("HEIGHT"));
-	 hilera1.appendChild(altura1);
-
-	 for(var i = 1; i <= aux.nr;i++){
-	 	var celda1 = document.createElement("th");
-	    celda1.appendChild(document.createTextNode("RONDA N"+i));
-	    hilera1.appendChild(celda1);
-
-	    var intentos1 = document.createElement("th");
-	    intentos1.appendChild(document.createTextNode("TRY"));
-	    hilera1.appendChild(intentos1);
-	 }
-
-	 var pontos1 = document.createElement("th");
-	    pontos1.appendChild(document.createTextNode("PTS"));
-	    hilera1.appendChild(pontos1);
-	var per1 = document.createElement("th");
-	    per1.appendChild(document.createTextNode("PTS%"));
-	    hilera1.appendChild(per1);
-
-	 tblBody.appendChild(hilera1);
+	columna = document.createElement("th");
+	columna.appendChild(document.createTextNode("PTS"));
+	fila.appendChild(columna);
+	columna = document.createElement("th");
+	columna.appendChild(document.createTextNode("PTS%"));
+	fila.appendChild(columna);
+	tblBody.appendChild(fila);
 
 	
 	for (var i = 0; i < aux.nj; i++) {
  		var pts =0;
- 		var t = 0;
- 		var e = 0;
-	  var hilera = document.createElement("tr");
-
-
-	  var nome = document.createElement("td");
-	  nome.appendChild(document.createTextNode(partida[i].name));
-	  hilera.appendChild(nome);
-	  var altura = document.createElement("td");
-	  altura.appendChild(document.createTextNode(partida[i].height));
-	  hilera.appendChild(altura);
+ 	  var t = 0;
+ 	  var c = 0;
+	  fila = document.createElement("tr");
+	  columna = document.createElement("td");
+	  columna.appendChild(document.createTextNode(partida[i].name));
+	  fila.appendChild(columna);
+	  columna = document.createElement("td");
+	  columna.appendChild(document.createTextNode(partida[i].height));
+	  fila.appendChild(columna);
 	  for (var j = 0; j < aux.nr; j++) {
 
-	    var celda = document.createElement("td");
-	    celda.appendChild(document.createTextNode(partida[i].rondas[j].pontos));
-	    hilera.appendChild(celda);
+	    columna = document.createElement("td");
+	    columna.appendChild(document.createTextNode(partida[i].rondas[j].pontos));
+	    fila.appendChild(columna);
 	    pts+=partida[i].rondas[j].pontos;
 	    var intentos = document.createElement("td");
-	    if(partida[i].rondas[j].pontos>0){
-	    	intentos.appendChild(document.createTextNode(partida[i].rondas[j].tentativas+1));
-	    	t+=partida[i].rondas[j].tentativas+1;
-	    }
-	    	
-	    else{
-	    	intentos.appendChild(document.createTextNode(partida[i].rondas[j].tentativas));
-	    	t+=partida[i].rondas[j].tentativas;
-	    }
-	    e += partida[i].rondas[j].tentativas;
-	    hilera.appendChild(intentos);
+	    intentos.appendChild(document.createTextNode(partida[i].rondas[j].tentativas));
+	    fila.appendChild(intentos);
+	    t+=partida[i].rondas[j].tentativas;
+	    c+=partida[i].rondas[j].cestos;
 	  }
 	 
 	  var pontos = document.createElement("td");
 	    pontos.appendChild(document.createTextNode(pts));
-	    hilera.appendChild(pontos);
+	    fila.appendChild(pontos);
 	var per = document.createElement("td");
-	var porcentaje = Number(((t-e)/t*100).toFixed(1));
+	var porcentaje = Number(((c/t)*100).toFixed(1));
 	    per.appendChild(document.createTextNode(porcentaje));
-	    hilera.appendChild(per);
+	    fila.appendChild(per);
 
-	  tblBody.appendChild(hilera);
+	  tblBody.appendChild(fila);
 	}
 	 
 	tabla.appendChild(tblBody);
