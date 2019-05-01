@@ -12,7 +12,7 @@
 #define CASUAL 1
 #define COMPETITIVE 2
 #define SUDDEN_DEATH 3
-
+#define MINIMO 1
 
 typedef struct jogador{
 	//Base de datos
@@ -445,26 +445,60 @@ void somaPontos(PLAYER * player,int n,int aux){
 	}
 }
 
-void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){
-	if(modo != SUDDEN_DEATH)
-		switch(n){
+void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                                                           ///////////////////////////////////////////////DIFERENCA
+float distatual2=campo->ancho;
+float distatual1=0.0;
+float distoriginal=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+float MAXIMO =sqrt(pow(campo->ancho,2)+pow(campo->largo/2,2));
+////////////////SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L/2^2+C^2)
+////////////////SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(A 1 METRO DO CESTO) DEVE MANTER ESSA POSICAO      MINIMO=1
 
-			case 1:
-				gerarPosicoes(player,campo,player->zona+1);
-				player->zona++;
+
+	if(modo != SUDDEN_DEATH){
+	
+	switch(n){
+
+		case 1:                                                        ///////////////////////ZONA MAIS LONGE- USADA PARA A QUANDO MARCA PONTO
+			gerarPosicoes(player,campo,player->zona+1);
+			player->zona++;
+		break;
+
+		case 2:                                            ///////////////////////ZONA MAIS PERTO- USADA PARA A QUANDO PERDE DUAS VEZES SEGUIDAS
+			gerarPosicoes(player,campo,player->zona-1);
+			player->zona--;
+		break;	
+
+
+
+		case 3:                                       ///////////////////////MESMA ZONA MAS MAIS LONGE- USADA PARA QUANDO ESTA  NA ZONA 3 E ACERTA
+			if(distoriginal>=MAXIMO-MAXIMO*0.002) 
+		{
+			
+			break;}
+			
+			else{
+			while (distatual1<=distoriginal ){           
+			gerarPosicoes(player,campo,player->zona); 
+			distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+			}    
+			
+			break;	}
+		
+		
+		
+		case 4:                                        ///////////////////////MESMA ZONA MAS MAIS PERTO- USADA PARA A ZONA 1
+		if(distoriginal<=MINIMO+0.1) 
 			break;
+		
+		else{
+			while (distatual2>=distoriginal  && distatual2!=MINIMO){
+			gerarPosicoes(player,campo,player->zona);      
+			distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);}
+		break;}
 
-			case 2:
-				gerarPosicoes(player,campo,player->zona-1);
-				player->zona--;
-			break;	
 
-			case 3:
-				gerarPosicoes(player,campo,player->zona);
-			break;	
-
-		}
-}
+	}
+}}
 
 void printPlayer(PLAYER *player){
 	int i;
@@ -731,6 +765,7 @@ void cestoAux(PLAYER *player, int n){
 
 int confirmRonda(PARTIDA *partida, int j,int i){
 	int aux = 1;
+
 	if(partida->players[j].bola.cesto){
 		partida->players[j].cestos[i]++;
 		cestoAux(&partida->players[j], 1);
@@ -753,7 +788,7 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 			if(partida->players[j].zona > 1)
 				adaptaZona(&partida->players[j],&partida->campo,2,partida->modoDeJogo);
 			else
-				adaptaZona(&partida->players[j],&partida->campo,3,partida->modoDeJogo);
+				adaptaZona(&partida->players[j],&partida->campo,4,partida->modoDeJogo);
 			partida->players[j].f = 0;
 		}
 		else {
