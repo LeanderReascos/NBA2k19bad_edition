@@ -7,7 +7,7 @@
 #include "settings.h"
 
 #define PI 3.14
-#define POSINICIO 3
+#define POSINICIO 1
 
 #define CASUAL 1
 #define COMPETITIVE 2
@@ -31,6 +31,7 @@ typedef struct jogador{
 	int *fallos;
 	int *tentativas;
 	int *cestos;
+	int f;
 }PLAYER;
 
 typedef struct partida{
@@ -61,14 +62,14 @@ void setsDefault(PARTIDA *partida){
 	partida->settings.musica = false;
 	partida->settings.videos  = false;
 	partida->settings.animacion  = false;
-	partida->settings.gnuplot  = true;
+	partida->settings.gnuplot  = false;
 	partida->settings.velocidadeAnimacion = 3;
 	partida->settings.nR[0] = 3; //ronda casual
-	partida->settings.nR[1] = 1; //competitive
+	partida->settings.nR[1] = 3; //competitive
 	partida->settings.nR[2] = 1; //muerte subita
 	partida->settings.nT[0] = 3; //tentaitvas casual
-	partida->settings.nT[1] = 1; //tentativas competitive
-	partida->settings.nT[1] = 1; //muerteSubita
+	partida->settings.nT[1] = 3; //tentativas competitive
+	partida->settings.nT[2] = 1; //muerteSubita
 }
 
 void resultado(PLAYER *player){
@@ -265,6 +266,18 @@ void readPlayer(PLAYER *player,int n){
 	}
 }
 
+void posRandomRonda(PARTIDA *partida, int n){
+	int i;
+	readCampo(&partida->campo);
+	gerarPosicoes(&partida->players[0],&partida->campo,n);
+	for(i=0; i<partida->njogadores; i++){
+		partida->players[i].bola.bonus = 0;
+		partida->players[i].zona = n;
+		partida->players[i].posX = partida->players[0].posX;
+		partida->players[i].posY = partida->players[0].posY;
+		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
+	}
+}
 
 void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 	int i,j;
@@ -302,14 +315,7 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 		}
 	}
 
-	gerarPosicoes(&partida->players[0],&partida->campo,POSINICIO);
-	for(i=0; i<partida->njogadores; i++){
-		partida->players[i].bola.bonus = 0;
-		partida->players[i].zona = POSINICIO;
-		partida->players[i].posX = partida->players[0].posX;
-		partida->players[i].posY = partida->players[0].posY;
-		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
-	}
+	posRandomRonda(partida,POSINICIO);
 
 }
 
@@ -408,10 +414,6 @@ void NEWGAME(PARTIDA *partidanova,int opcao){
 	partidanova->campo.lin=0;
 	strcpy(partidanova->campo.nome,planeta->nome);
 	strcpy(partidanova->campo.file,"Ficheiros_de_texto/campo");
-
-	CAMPO *c = &partidanova->campo;
-	readCampo(c);
-
 }
 
 void somaPontos(PLAYER * player,int n,int aux){	
@@ -443,25 +445,25 @@ void somaPontos(PLAYER * player,int n,int aux){
 	}
 }
 
-void adaptaZona(PLAYER* player,CAMPO* campo, int n){
-	switch(n){
+void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){
+	if(modo != SUDDEN_DEATH)
+		switch(n){
 
-		case 1:
-			gerarPosicoes(player,campo,player->zona+1);
-			player->zona++;
-		break;
+			case 1:
+				gerarPosicoes(player,campo,player->zona+1);
+				player->zona++;
+			break;
 
-		case 2:
-			gerarPosicoes(player,campo,player->zona-1);
-			player->zona--;
-		break;	
+			case 2:
+				gerarPosicoes(player,campo,player->zona-1);
+				player->zona--;
+			break;	
 
-		case 3:
-			gerarPosicoes(player,campo,player->zona);
-		break;	
+			case 3:
+				gerarPosicoes(player,campo,player->zona);
+			break;	
 
-
-	}
+		}
 }
 
 void printPlayer(PLAYER *player){
@@ -735,25 +737,28 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 		somaPontos(&partida->players[j],i,partida->players[j].bola.bonus);
 		partida->players[j].bola.bonus = 1;
 		if(partida->players[j].zona < 3)
-			adaptaZona(&partida->players[j],&partida->campo,1);
+			adaptaZona(&partida->players[j],&partida->campo,1,partida->modoDeJogo);
 		else
-			adaptaZona(&partida->players[j],&partida->campo,3);
+			adaptaZona(&partida->players[j],&partida->campo,3,partida->modoDeJogo);
 		if(partida->modoDeJogo == SUDDEN_DEATH)
 			aux = 0;
+		partida->players[j].f = 0;
 	}
 	else{
 		cestoAux(&partida->players[j], 2);
 		partida->players[j].fallos[i]++;
 
-		if(partida->players[j].fallos[i] == partida->tentativas || partida->players[j].fallos[i]%2 == 0){
+		if(partida->players[j].f/*partida->players[j].fallos[i] == partida->tentativas || partida->players[j].fallos[i]%2 == 0*/){
 			partida->players[j].bola.bonus = 0;
 			if(partida->players[j].zona > 1)
-				adaptaZona(&partida->players[j],&partida->campo,2);
+				adaptaZona(&partida->players[j],&partida->campo,2,partida->modoDeJogo);
 			else
-				adaptaZona(&partida->players[j],&partida->campo,3);
+				adaptaZona(&partida->players[j],&partida->campo,3,partida->modoDeJogo);
+			partida->players[j].f = 0;
 		}
 		else {
 			partida->players[j].bola.bonus = 0;
+			partida->players[j].f++;
 		}
 		
 	}
@@ -789,7 +794,7 @@ void listaMelhores(PARTIDA* partida){
 	int contador;
 	int conseguiu=0,m,j,j2,i2;
 
-	FILE * fp2=fopen("Base_de_datos\\HIGHSCORES.data","r");
+	FILE * fp2=fopen("Base_de_datos/HIGHSCORES.data","r");
 	if (fp2==NULL) exit(-1);
 		
 	int i;
@@ -817,7 +822,7 @@ void listaMelhores(PARTIDA* partida){
 			i++;
 		}
 	}
-		fclose(fp2);
+	fclose(fp2);
 		
 	int* n=(int*) malloc(partida->njogadores*sizeof(int));    
 	int tamanho=contador,conseguiu2;          
@@ -843,8 +848,8 @@ void listaMelhores(PARTIDA* partida){
 	
 	FILE * fp=fopen("Base_de_datos/HIGHSCORES.data","r+");
 	if (fp==NULL) exit(-1);	
-	FILE *json = fopen("Web/highscores.json","w");
-	if (conseguiu==1){                ///////CASO HAJA ALTERACOES, DÁ-SE A NOTICIA MOSTRANDO A "TABELA"               
+	if (conseguiu==1){     
+		FILE *json = fopen("Web/highscores.json","w");           ///////CASO HAJA ALTERACOES, DÁ-SE A NOTICIA MOSTRANDO A "TABELA"               
 		system("cls");          
 		printHeader();
 		prints("Ficheiros_de_texto/CONGRATULATIONS.txt");
@@ -857,23 +862,38 @@ void listaMelhores(PARTIDA* partida){
 				fprintf(json, ",");
 		}
 		fprintf(json, "]'");
+		fclose(json);
 	}
 
 	free(lista);
 	fclose(fp);
-	fclose(json);
 	system("pause");
 }
+
+
+void poeZeros(PARTIDA* partida){                                         
+	int i;
+	for(i=0;i<partida->njogadores;i++){
+		partida->players[i].f=0;
+		
+	}
+}
+
 
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;
-	int last,nP;
+	int last,nP,zona;
 	if(partida->modoDeJogo == SUDDEN_DEATH){
 		aux = 1;
 		k = 0;
+		poeZeros(partida);
 		while(aux){
 			i = 0;
+			if(k>0 && k%2 == 0){
+				zona=1+rand()%2; 
+				posRandomRonda(partida,zona);
+			}
 			for(j=0; j<partida->njogadores && aux;j++){
 				runRonda(partida,j,i,k);
 				aux = confirmRonda(partida,j,i);
@@ -889,6 +909,13 @@ void playGame(PARTIDA *partida){
 	}
 	else{
 		for(i=0; i<partida->nRondas ; i++){
+			poeZeros(partida);
+			if(i>2){
+				zona=1+rand()%2; 
+				posRandomRonda(partida,zona);
+			}
+			else if(i>0)
+				posRandomRonda(partida,i+1);
 			for(j=0; j<partida->njogadores;j++){
 				aux = 1;
 				for(k=0; k<partida->tentativas && aux; k++){
@@ -906,6 +933,13 @@ void playGame(PARTIDA *partida){
 			printf("EMPATE\n");
 			printf("%d\n",partida->nRondas );
 			for(i=last; i<partida->nRondas; i++){
+				if(i>2){
+				zona=1+rand()%2; 
+				posRandomRonda(partida,zona);
+				}
+				else if(i>0)
+					posRandomRonda(partida,i+1);
+				poeZeros(partida);
 				for(j=0; j<nP;j++){
 					for(k=0; k<partida->tentativas  && aux; k++){
 						runRonda(partida,j,i,k);
@@ -924,5 +958,4 @@ void playGame(PARTIDA *partida){
 	system("pause");
 	informacao(partida);
 	listaMelhores(partida);
-	system("start Web/index.htm")
 }

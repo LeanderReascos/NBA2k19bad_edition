@@ -195,7 +195,7 @@ float anguloLanzamento(){
 		if(anguloLanzamento > angMax)		anguloLanzamento = angMax;
 		if(anguloLanzamento < angMin) anguloLanzamento = angMin;
 		//printf("\r\tLaunch Angle: %.2f",anguloLanzamento);
-		barraCarga(angMax,anguloLanzamento,"Launch Angle:","graus");
+		barraCarga(angMax,anguloLanzamento,"Launch Angle:","degrees");
 				
 	}while(a != 0);
 

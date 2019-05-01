@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 
 #define CASUAL 1
 #define COMPETITIVE 2
@@ -10,6 +11,7 @@
 #define GNU 4
 #define ROUND 5
 #define TRY 6
+#define INSTALL 7
 
 typedef int BOOL;
 #define true 1
@@ -148,7 +150,8 @@ void selectMenu(int n,int v[]){
 				printHeader();
 				printtext(SUDDEN_DEATH,"Ficheiros_de_texto/modesVisual",7);
 				printtext(a,"Ficheiros_de_texto/numberSelect",8);
-				printf("\n\tno se puede cambiar\n");
+				printf("\n\tno can't be changed'\n");
+				system("pause");
 				break;
 		}
 	}
@@ -156,7 +159,17 @@ void selectMenu(int n,int v[]){
 }
 
 void segundoMenu(int op,SETTINGS *sets){
+	FILE *cmd = NULL;
 	switch(op){
+		case INSTALL:
+		    cmd = popen("cmd", "w");
+		    if (cmd == NULL) 
+		        exit(0);
+		    fprintf(cmd, "cls\n");
+		    fprintf(cmd, "cd dependencies\n");
+		    fprintf(cmd, "dependencies.bat\n");
+		    fclose(cmd);
+			break;
 		case MUSIC:
 			boleanMenu(6,&sets->musica);
 			break;

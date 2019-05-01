@@ -158,8 +158,8 @@ void printParabola(BOLA *bola){
 	FILE *gp;
     gp = popen(GNUPLOT, "w");
     if (gp == NULL) {
-        printf("Erro ao abrir pipe para o GNU plot.\n"
-            "Instale gnuplot, dependencia necesaria para o funcionamento completo do programa\n");
+       	printf("Error opening pipe to GNU plot.\n"
+            "This program needs gnuplot to function fully, please install it.\n");  
         exit(0);
     }
     fprintf(gp, "set yrange[0:%f]\n", bola->hMax);

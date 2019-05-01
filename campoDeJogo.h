@@ -45,7 +45,7 @@ void readCampo(CAMPO *campo){
 	FILE *fp;
 	fp = fopen(campo->file,"r");
 	if(fp==NULL){
-		printf("Error memoria 0\n");
+		printf("Memory error 0\n");
 		exit(-1);
 	}
 	int i=0;
@@ -55,20 +55,20 @@ void readCampo(CAMPO *campo){
 	}
 	campo->campoDeJuego = (char **) malloc(sizeof(char *));
 	if(campo->campoDeJuego == NULL){
-		printf("Error memoria 1\n");
+		printf("Memory error 1\n");
 		exit(-1);
 	}
 	while(fgets(buffer,sizeof(buffer),fp)){
 		if(i >  0){
 			campo->campoDeJuego = (char **) realloc(campo->campoDeJuego,(i+1)*sizeof(char *));
 			if(campo->campoDeJuego == NULL) {
-				printf("Error memoria 2\n");
+				printf("Memory error 2\n");
 				exit(-1);
 			}
 		}
 		campo->campoDeJuego[i] = (char *) malloc(strlen(buffer)*sizeof(char));
 		if(campo->campoDeJuego == NULL){
-			printf("Error memoria 3\n");
+			printf("Memory error 3\n");
 			exit(-1);
 		}
 		strcpy(campo->campoDeJuego[i],buffer);
