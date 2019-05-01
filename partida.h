@@ -121,24 +121,24 @@ int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 	}	
 	if(partida->modoDeJogo==2 && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontuaÃ§ao
 	
-		for(m=0;m<j;m++){
-			int aux = partida->players[jogadoresprimeiro[m]].numeroRondas;
+		for(m=0;m<partida->njogadores;m++){
+			int aux = partida->players[m].numeroRondas;
 			(*lastronda) = aux;
 
-			partida->players[jogadoresprimeiro[m]].numeroRondas+=extras;             			//////aumento do numero de rondas usando o vetor jogadoresprimeiro porque guarda os indices dos jogadores que estejam nesta situacao
-			partida->players[jogadoresprimeiro[m]].pontosRondas=(int*) realloc(partida->players[jogadoresprimeiro[m]].pontosRondas,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
-			partida->players[jogadoresprimeiro[m]].fallos=(int*) realloc(partida->players[jogadoresprimeiro[m]].fallos,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
-			partida->players[jogadoresprimeiro[m]].cestos=(int*) realloc(partida->players[jogadoresprimeiro[m]].cestos,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
-			partida->players[jogadoresprimeiro[m]].tentativas=(int*) realloc(partida->players[jogadoresprimeiro[m]].tentativas,sizeof(int)*(partida->players[jogadoresprimeiro[m]].numeroRondas)); 
+			partida->players[m].numeroRondas+=extras;             			//////aumento do numero de rondas usando o vetor jogadoresprimeiro porque guarda os indices dos jogadores que estejam nesta situacao
+			partida->players[m].pontosRondas=(int*) realloc(partida->players[m].pontosRondas,sizeof(int)*(partida->players[m].numeroRondas)); 
+			partida->players[m].fallos=(int*) realloc(partida->players[m].fallos,sizeof(int)*(partida->players[m].numeroRondas)); 
+			partida->players[m].cestos=(int*) realloc(partida->players[m].cestos,sizeof(int)*(partida->players[m].numeroRondas)); 
+			partida->players[m].tentativas=(int*) realloc(partida->players[m].tentativas,sizeof(int)*(partida->players[m].numeroRondas)); 
 			res = 1;
-			if(partida->players[jogadoresprimeiro[m]].pontosRondas == NULL || partida->players[jogadoresprimeiro[m]].fallos == NULL)
+			if(partida->players[m].pontosRondas == NULL || partida->players[m].fallos == NULL)
 					exit(-1);
 			int k;
 			for(k=0; k<extras; k++){
-				partida->players[jogadoresprimeiro[m]].pontosRondas[aux+k] = 0;
-				partida->players[jogadoresprimeiro[m]].fallos[aux+k] = 0;
-				partida->players[jogadoresprimeiro[m]].cestos[aux+k] = 0;
-				partida->players[jogadoresprimeiro[m]].tentativas[aux+k] = 0;
+				partida->players[m].pontosRondas[aux+k] = 0;
+				partida->players[m].fallos[aux+k] = 0;
+				partida->players[m].cestos[aux+k] = 0;
+				partida->players[m].tentativas[aux+k] = 0;
 			}
 		}
 
@@ -928,7 +928,7 @@ void playGame(PARTIDA *partida){
 				}
 			}
 		}
-		
+		ordenar(partida);
 		if(VeRondas(partida,&last,&nP,2)){
 			printf("EMPATE\n");
 			printf("%d\n",partida->nRondas );
