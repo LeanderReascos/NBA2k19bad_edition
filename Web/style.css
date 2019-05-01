@@ -1,7 +1,7 @@
 * {box-sizing: border-box;}
 body{
 	margin: 0;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Karla', sans-serif;
 	background-color: #D5D5DF;
 }
 
@@ -93,4 +93,34 @@ td{
 	border-color: #808080;
 	text-align: center;
 	vertical-align: center;
+}
+
+h3{
+	font-family: 'Karla', sans-serif;
+	font-size: 30px;
+}
+
+h2{
+	font-family: 'Karla', sans-serif;
+	font-size: 25px;
+}
+
+p{
+	font-family: 'Karla', sans-serif;
+	color:#353535;
+	text-align: justify;
+}
+li{
+	margin-left: 20px;
+	font-size: 20px;
+	font-family: 'Karla', sans-serif;
+	color:#353535;
+	text-align: left;
+}
+code {
+    background-color: #eee;
+    border-radius: 3px;
+    font-family: courier, monospace;
+    padding: 0 3px;
+    font-size: 18;
 }
