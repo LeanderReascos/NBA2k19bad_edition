@@ -7,7 +7,7 @@
 #include "settings.h"
 
 #define PI 3.14
-#define POSINICIO 1
+#define POSINICIO 3
 
 #define CASUAL 1
 #define COMPETITIVE 2
@@ -18,7 +18,7 @@ typedef struct jogador{
 	//Base de datos
 	char *name;
 	float altura;
-	//posição
+	//posi��o
 	float posX;
 	float posY;
 	int zona;
@@ -100,7 +100,7 @@ int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 	(*np) = 0;
 	int i,j=1,m;
 	int* n=(int*) malloc(sizeof(int)*(partida->njogadores));            				/////array das somas dos pontos dos jogadores por ordem de como os proprios estao organizados
-	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontuaÃ§ao
+	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontuaçao
 	jogadoresprimeiro[0]=0;
 
 	SomaRondas(partida,n);
@@ -119,7 +119,7 @@ int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 		}
 	
 	}	
-	if(partida->modoDeJogo==2 && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontuaÃ§ao
+	if(partida->modoDeJogo==2 && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontuaçao
 	
 		for(m=0;m<partida->njogadores;m++){
 			int aux = partida->players[m].numeroRondas;
@@ -446,59 +446,49 @@ void somaPontos(PLAYER * player,int n,int aux){
 }
 
 void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                                                           ///////////////////////////////////////////////DIFERENCA
-float distatual2=campo->ancho;
-float distatual1=0.0;
-float distoriginal=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
-float MAXIMO =sqrt(pow(campo->ancho,2)+pow(campo->largo/2,2));
-////////////////SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L/2^2+C^2)
-////////////////SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(A 1 METRO DO CESTO) DEVE MANTER ESSA POSICAO      MINIMO=1
-
-
+	float distatual2=campo->ancho;
+	float distatual1=0.0;
+	float distoriginal=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+	float MAXIMO =sqrt(pow(campo->ancho,2)+pow(campo->largo/2,2));
+	/*SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L/2^2+C^2)
+	//SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(A 1 METRO DO CESTO) DEVE MANTER ESSA POSICAO      MINIMO=1*/
 	if(modo != SUDDEN_DEATH){
-	
-	switch(n){
+		switch(n){
 
-		case 1:                                                        ///////////////////////ZONA MAIS LONGE- USADA PARA A QUANDO MARCA PONTO
-			gerarPosicoes(player,campo,player->zona+1);
-			player->zona++;
-		break;
-
-		case 2:                                            ///////////////////////ZONA MAIS PERTO- USADA PARA A QUANDO PERDE DUAS VEZES SEGUIDAS
-			gerarPosicoes(player,campo,player->zona-1);
-			player->zona--;
-		break;	
-
-
-
-		case 3:                                       ///////////////////////MESMA ZONA MAS MAIS LONGE- USADA PARA QUANDO ESTA  NA ZONA 3 E ACERTA
-			if(distoriginal>=MAXIMO-MAXIMO*0.002) 
-		{
-			
-			break;}
-			
-			else{
-			while (distatual1<=distoriginal ){           
-			gerarPosicoes(player,campo,player->zona); 
-			distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
-			}    
-			
-			break;	}
-		
-		
-		
-		case 4:                                        ///////////////////////MESMA ZONA MAS MAIS PERTO- USADA PARA A ZONA 1
-		if(distoriginal<=MINIMO+0.1) 
+			case 1:                                                        ///////////////////////ZONA MAIS LONGE- USADA PARA A QUANDO MARCA PONTO
+				gerarPosicoes(player,campo,player->zona+1);
+				player->zona++;
 			break;
-		
-		else{
-			while (distatual2>=distoriginal  && distatual2!=MINIMO){
-			gerarPosicoes(player,campo,player->zona);      
-			distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);}
-		break;}
 
+			case 2:                                            ///////////////////////ZONA MAIS PERTO- USADA PARA A QUANDO PERDE DUAS VEZES SEGUIDAS
+				gerarPosicoes(player,campo,player->zona-1);
+				player->zona--;
+			break;	
 
+			case 3: 
+			    gerarPosicoes(player,campo,player->zona);
+			    distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);                                  ///////////////////////MESMA ZONA MAS MAIS LONGE- USADA PARA QUANDO ESTA  NA ZONA 3 E ACERTA
+				if(!(distoriginal>=MAXIMO-MAXIMO*0.002)){
+					while (distatual1<=distoriginal ){           
+					gerarPosicoes(player,campo,player->zona); 
+					distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+					}
+				}   
+				break;	
+			
+			case 4:  
+				gerarPosicoes(player,campo,player->zona);  
+				distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);                                    ///////////////////////MESMA ZONA MAS MAIS PERTO- USADA PARA A ZONA 1
+				if(!(distoriginal<=MINIMO+0.1)){
+					while (distatual2>=distoriginal  && distatual2!=MINIMO){
+						gerarPosicoes(player,campo,player->zona);      
+						distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+					}
+				}
+				break;
+		}
 	}
-}}
+}
 
 void printPlayer(PLAYER *player){
 	int i;
@@ -510,7 +500,7 @@ void printPlayer(PLAYER *player){
 	printf("|   %.2f   ",player->altura);
 
 	for(i=0; i<player->numeroRondas;i++){
-		printf("|     %d     |   %d   ",player->pontosRondas[i],player->tentativas[i]);		
+		printf("|     %d     |    %d    ",player->pontosRondas[i],player->tentativas[i]);		
 	}
 	printf("|\n");
 }
@@ -520,7 +510,7 @@ void printEncabezado(int n){
 	int i;
 	printf("| No |          NAME          |  HEIGHT  |");
 	for(i=0; i<n;i++){
-		printf("  RONDA %d  |  TRY  |",i+1);
+		printf("  ROUND %d  |  TRIES  |",i+1);
 	}
 	printf("\n");
 	for(i=0; i<42+21*n; i++){
@@ -589,7 +579,7 @@ void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	int cestos=0;
 	fprintf(json, "{\"name\":\"%s\", \"height\": %.2f,\"NumeroRondas\": %d,\"rondas\":[", player->name,player->altura,player->numeroRondas);
 	for(i=0; i<player->numeroRondas;i++){
-		fprintf(info,"|     %d     |   %d   ",player->pontosRondas[i],player->tentativas[i]);
+		fprintf(info,"|     %d     |    %d    ",player->pontosRondas[i],player->tentativas[i]);
 		fprintf(json, "{\"pontos\":%d,\"tentativas\":%d,\"cestos\":%d}",player->pontosRondas[i],player->tentativas[i],player->cestos[i]);
 		
 		if(i<player->numeroRondas-1)
@@ -640,7 +630,7 @@ void informacao(PARTIDA *partida){
 	int n=partida->nRondas;
 	fprintf(information,"| No |          NAME          |  HEIGHT  |");
 	for(i=0; i<n;i++){
-		fprintf(information,"  RONDA %d  |  TRY  |",i+1);
+		fprintf(information,"  ROUND %d  |  TRIES  |",i+1);
 	}
 	fprintf(information,"  PTS%%  |");
 	fprintf(information,"\n");
@@ -884,7 +874,7 @@ void listaMelhores(PARTIDA* partida){
 	FILE * fp=fopen("Base_de_datos/HIGHSCORES.data","r+");
 	if (fp==NULL) exit(-1);	
 	if (conseguiu==1){     
-		FILE *json = fopen("Web/highscores.json","w");           ///////CASO HAJA ALTERACOES, DÁ-SE A NOTICIA MOSTRANDO A "TABELA"               
+		FILE *json = fopen("Web/highscores.json","w");           ///////CASO HAJA ALTERACOES, D�-SE A NOTICIA MOSTRANDO A "TABELA"               
 		system("cls");          
 		printHeader();
 		prints("Ficheiros_de_texto/CONGRATULATIONS.txt");
