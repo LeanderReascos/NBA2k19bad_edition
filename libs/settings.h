@@ -8,10 +8,11 @@
 #define MUSIC 1
 #define VIDEO 2
 #define ANIMATION 3
-#define GNU 4
-#define ROUND 5
-#define TRY 6
-#define INSTALL 7
+#define VELOCITY 4
+#define GNU 5
+#define ROUND 6
+#define TRY 7
+#define INSTALL 8
 
 typedef int BOOL;
 #define true 1
@@ -116,6 +117,22 @@ int selectNumber(int *n){
 			(*n)=9;
 	return ans;
 }
+
+void selectVelocity(float *n){
+	int ans;
+	int value = 1;
+	do{
+		system("cls");
+		printHeader();
+		printTextTo(19);
+		printf("\n");
+		printtext(value+2,"libs/Ficheiros_de_texto/numberSelect",8);	
+		ans = selectNumber(&value);
+		(*n)=(float)value;
+	}while(ans != 0);
+	
+}
+
 void selectMenu(int n,int v[]){
 	int ans;
 	system("cls");
@@ -188,5 +205,9 @@ void segundoMenu(int op,SETTINGS *sets){
 		case TRY:
 			selectMenu(11,sets->nT);
 			break;
+		case VELOCITY:
+			selectVelocity(&sets->velocidadeAnimacion);
+			break;
+			
 	}
 }
