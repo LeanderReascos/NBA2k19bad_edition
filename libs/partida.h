@@ -20,7 +20,7 @@ typedef struct jogador{
 	//Base de datos
 	char *name;
 	float altura;
-	//posi√ß√£o
+	//posiÁ„o
 	float posX;
 	float posY;
 	int zona;
@@ -62,7 +62,7 @@ typedef struct planeta{
 
 /*Valores por default para o decorrer do jogo*/
 void setsDefault(PARTIDA *partida){
-	partida->settings.musica = false;
+	partida->settings.musica = true;
 	partida->settings.videos  = false;
 	partida->settings.animacion  = false;
 	partida->settings.gnuplot  = false;
@@ -74,8 +74,8 @@ void setsDefault(PARTIDA *partida){
 	partida->settings.nT[1] = 3; //tentativas competitive
 	partida->settings.nT[2] = 1; //muerteSubita
 }
-/***********************************************************FUN√áOES PARA A CRIA√á√ÇO DA PARTIDA************************************************************/
-/*Cria√ß√£o da partida*/
+/***********************************************************FUN«OES PARA A CRIA«¬O DA PARTIDA************************************************************/
+/*CriaÁ„o da partida*/
 
 void NEWGAME(PARTIDA *partidanova,int opcao){
 	srand((unsigned int)time(NULL));
@@ -92,8 +92,8 @@ void NEWGAME(PARTIDA *partidanova,int opcao){
 	do{
 		system("cls");
 		printHeader();	
-		printtext(17,"Ficheiros_de_texto/subHeaders",7);
-		printtext(nJugadores+2,"Ficheiros_de_texto/numberSelect",8);
+		printtext(17,"libs/Ficheiros_de_texto/subHeaders",7);
+		printtext(nJugadores+2,"libs/Ficheiros_de_texto/numberSelect",8);
 		aux = selectNumber(&nJugadores);
 	}
 	while(aux != 0);
@@ -103,7 +103,7 @@ void NEWGAME(PARTIDA *partidanova,int opcao){
 	partidanova->players = (PLAYER *) malloc(partidanova->njogadores*sizeof(PLAYER));
 
 	FILE* fp;
-	fp=fopen("Base_de_datos/planets.data","r");
+	fp=fopen("libs/Base_de_datos/planets.data","r");
 	if(fp==NULL){
 		printf("ERROR\n");
 		exit(-1);
@@ -153,14 +153,14 @@ void NEWGAME(PARTIDA *partidanova,int opcao){
 	partidanova->campo.largo=planeta->lcampo;
 	partidanova->campo.lin=0;
 	strcpy(partidanova->campo.nome,planeta->nome);
-	strcpy(partidanova->campo.file,"Ficheiros_de_texto/campo");
+	strcpy(partidanova->campo.file,"libs/Ficheiros_de_texto/campo");
 }
 
 /*Ler os jogadores da base de datos*/
 void readPlayer(PLAYER *player,int n){
 	int i = 0,j;
 	FILE *fp;
-	fp = fopen("Base_de_datos/Jogadores.data","r");
+	fp = fopen("libs/Base_de_datos/Jogadores.data","r");
 	if(fp == NULL){
 		printf("Error ler jogador\n");
 		exit(-1);
@@ -196,7 +196,7 @@ void adicionarjugadores(PARTIDA *partida){
 		}
 	}
 }
-/*Gera uma pisi√ß√£o aleartoria em fun√ßao de um n[1,3] sendo as respetivas areas de jogo 
+/*Gera uma pisiÁ„o aleartoria em funÁao de um n[1,3] sendo as respetivas areas de jogo 
 	n=1 Corresponde a area mais proxima do cesto (The Paint)
 	n=2 A area que esta entre a area dos 3 pontos e a mais proxima
 	n=3 A area dos 3 pontos*/
@@ -254,7 +254,7 @@ void gerarPosicoes(PLAYER* jogador,CAMPO* campo,int n){
 }
 
 
-/*Gera a posi√ß√£o aleartoria inicial para todos os jogadores dependendo de um n[1,3]*/
+/*Gera a posiÁ„o aleartoria inicial para todos os jogadores dependendo de um n[1,3]*/
 void posRandomRonda(PARTIDA *partida, int n){
 	int i;
 	readCampo(&partida->campo);
@@ -306,9 +306,9 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 
 }
 
-/***********************************************************FUN√áOES PARA A MOSTRAR OS VALORES DO JOGO************************************************************/
+/***********************************************************FUN«OES PARA A MOSTRAR OS VALORES DO JOGO************************************************************/
 
-/*Fun√ß√£o que serve para imprimir os valores formatados do PLAYER */
+/*FunÁ„o que serve para imprimir os valores formatados do PLAYER */
 void printPlayer(PLAYER *player){
 	int i;
 	int n = strlen(player->name);
@@ -324,7 +324,7 @@ void printPlayer(PLAYER *player){
 	printf("|\n");
 }
 
-/*Mostra o cabe√ßalho dos valores de cada ronda desta maneira com n o numero de ronda:
+/*Mostra o cabeÁalho dos valores de cada ronda desta maneira com n o numero de ronda:
 | No |          NAME          |  HEIGHT  |  ROUND n  |  TRIES  |*/
 void printEncabezado(int n){
 	int i;
@@ -339,13 +339,13 @@ void printEncabezado(int n){
 	printf("\n");
 }
 
-/*Mostra na ecra os valores de toda a partida, Campo de jogo com as posi√ß√µes dos jogadores e os valores de cada jogador
-Utilizando as fun√ß√µes anteriores para isso*/
+/*Mostra na ecra os valores de toda a partida, Campo de jogo com as posiÁıes dos jogadores e os valores de cada jogador
+Utilizando as funÁıes anteriores para isso*/
 void printPartida(PARTIDA *partida){
 	system("cls");
-	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
+	printtext(partida->nPlaneta,"libs/Ficheiros_de_texto/planetsVisual",16);
 	printf("\n");
-	printtext(partida->modoDeJogo,"Ficheiros_de_texto/modesVisual",7);
+	printtext(partida->modoDeJogo,"libs/Ficheiros_de_texto/modesVisual",7);
 	printf("\n\n\n");
 	int i;
 
@@ -364,9 +364,9 @@ void printPartida(PARTIDA *partida){
 
 }
 
-/***********************************************************FUN√áOES PARA EXPORTAR OS RESULTADOS DO JOGO************************************************************/
+/***********************************************************FUN«OES PARA EXPORTAR OS RESULTADOS DO JOGO************************************************************/
 
-/*Exporta a informa√ß√£o de cada jogador aos dos ficheiros correspondentes*/
+/*Exporta a informaÁ„o de cada jogador aos dos ficheiros correspondentes*/
 void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	int i;
 	int n = strlen(player->name);
@@ -393,7 +393,7 @@ void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	fprintf(info,"|   %.1f   |\n",per*100);
 }
 
-/*Mostrar ficheiros de texto no programa para ter uma melhor apresenta√ß√£o*/
+/*Mostrar ficheiros de texto no programa para ter uma melhor apresentaÁ„o*/
 void fprintText(int n,char file[100],int a, FILE *info){
 	FILE *fp;
 	fp = fopen(file,"r");
@@ -409,7 +409,7 @@ void fprintText(int n,char file[100],int a, FILE *info){
 	fclose(fp);
 }
 
-/*Exporta a informa√ß√£o da partida para dois ficheiros um .txt(mostrar em texto plano os resultados) 
+/*Exporta a informaÁ„o da partida para dois ficheiros um .txt(mostrar em texto plano os resultados) 
 e um .json(cria uma base de datos para ser usada na pagina web)*/
 void informacao(PARTIDA *partida){
 	char name[100];
@@ -418,7 +418,7 @@ void informacao(PARTIDA *partida){
 	strcat(name,".txt");
 
 	FILE *json;
-	json = fopen("Web/database.json","w");
+	json = fopen("libs/Web/database.json","w");
 
 	FILE *information;
 	information = fopen(name,"w");
@@ -426,7 +426,7 @@ void informacao(PARTIDA *partida){
 	if(json == NULL || information == NULL)
 		exit(-1);
 
-	fprintText(1,"Ficheiros_de_texto/header",16,information);
+	fprintText(1,"libs/Ficheiros_de_texto/header",16,information);
 	fprintf(information,"\n\n\n");
 
 	int i;
@@ -468,6 +468,7 @@ void exitGame(int v,PARTIDA *partida){
 		int x = mainSelect("leave");
 		if(x == 1){
 			informacao(partida);
+			printf("\n\tTanks for play.\n");
 			exit(0);
 		}
 		else
@@ -476,15 +477,15 @@ void exitGame(int v,PARTIDA *partida){
 }
 
 
-/***********************************************************FUN√áOES QUE DECORREM O JOGO DA PARTIDA************************************************************/
+/***********************************************************FUN«OES QUE DECORREM O JOGO DA PARTIDA************************************************************/
 
-/*Nesta fun√ß√£o sao utilizadas fun√ß√µes do ficheiro valoreslaunch.h (para inserir os valores respetivos a cada lan√ßamento)
-e a fun√ßao launch.h (para fazer o lan√ßamento de cada bola)*/
+/*Nesta funÁ„o sao utilizadas funÁıes do ficheiro valoreslaunch.h (para inserir os valores respetivos a cada lanÁamento)
+e a funÁao launch.h (para fazer o lanÁamento de cada bola)*/
 void runRonda(PARTIDA *partida, int j,int i, int k){
 	system("cls");
-	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
+	printtext(partida->nPlaneta,"libs/Ficheiros_de_texto/planetsVisual",16);
 	printf("\n");
-	printtext(partida->modoDeJogo,"Ficheiros_de_texto/modesVisual",7);
+	printtext(partida->modoDeJogo,"libs/Ficheiros_de_texto/modesVisual",7);
 	printf("\n\n\n");
 	printPartida(partida);
 	printf("\n\n");
@@ -536,12 +537,12 @@ void runRonda(PARTIDA *partida, int j,int i, int k){
 			
 }
 
-/***********************************************************FUN√áOES PYTHON************************************************************/
+/***********************************************************FUN«OES PYTHON************************************************************/
 
 /*Variavel auxiliar para controlo dos ficheiros de video de acordo a validade do cesto*/
 void cestoAux(PLAYER *player, int n){
 	FILE * file2;
-	file2=fopen("VIDEOS/.videos","w");
+	file2=fopen("libs/VIDEOS/.videos","w");
 	if(file2==NULL){
 		printf("nao abriu commands\n");
 		exit(-1);
@@ -552,7 +553,7 @@ void cestoAux(PLAYER *player, int n){
 		fprintf(file2, "haha");
 	fclose(file2);
 }
-/*Abre e reproduz em segundo plano as fun√ß√µes de python que mostram os videos*/
+/*Abre e reproduz em segundo plano as funÁıes de python que mostram os videos*/
 void cesto(){
 	FILE *py;
     py = popen("py", "w");
@@ -561,14 +562,14 @@ void cesto(){
             "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
         exit(0);
     }
-    fprintf(py, "exec(open('video.py').read())");
+    fprintf(py, "exec(open('libs/video.py').read())");
 
     fclose(py);
 }
 
-/***********************************************************FUN√áOES QUE VERIFICAM O ESTADO DA PARTIDA************************************************************/
+/***********************************************************FUN«OES QUE VERIFICAM O ESTADO DA PARTIDA************************************************************/
 
-/*Soma os ontos ao jogador de acordo a ronda e se apresenta o bonus, tudo isto em fun√ß√£o da zona*/
+/*Soma os ontos ao jogador de acordo a ronda e se apresenta o bonus, tudo isto em funÁ„o da zona*/
 void somaPontos(PLAYER * player,int n,int aux){	
 	switch(player->zona){
 		case 1:
@@ -598,7 +599,7 @@ void somaPontos(PLAYER * player,int n,int aux){
 	}
 }
 
-/* Muda de posi√ß√£o do jogador em fun√ß√£o ao modo de jogo, posi√ß√£o atual e se foi ou nao cesto o lan√ßamento 
+/* Muda de posiÁ„o do jogador em funÁ„o ao modo de jogo, posiÁ„o atual e se foi ou nao cesto o lanÁamento 
 SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L/2^2+C^2)
 SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(A 1 METRO DO CESTO) DEVE MANTER ESSA POSICAO      MINIMO=1*/
 void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                                                           ///////////////////////////////////////////////DIFERENCA
@@ -645,8 +646,8 @@ void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                   
 	}
 }
 
-/*Depois de ser executado o lan√ßamento verifica se este foi cesto ou nao, para isto utiliza os valores antes ja calculados
-no lan√ßamento (fun√ßoes de launch.h)*/
+/*Depois de ser executado o lanÁamento verifica se este foi cesto ou nao, para isto utiliza os valores antes ja calculados
+no lanÁamento (funÁoes de launch.h)*/
 int confirmRonda(PARTIDA *partida, int j,int i){
 	int aux = 1;
 
@@ -695,7 +696,7 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 	return aux;
 }
 
-/***********************************************************FUN√áOES AUXILIARES************************************************************/
+/***********************************************************FUN«OES AUXILIARES************************************************************/
 /*Conta os pontos totais de um PLAYER*/
 void resultado(PLAYER *player){
 	int i;
@@ -706,7 +707,7 @@ void resultado(PLAYER *player){
 	player->total = soma;
 }
 
-/*Ordena aos jogadores do melhor ao menor em fun√ß√£o dos seus pontos*/
+/*Ordena aos jogadores do melhor ao menor em funÁ„o dos seus pontos*/
 void ordenar(PARTIDA *partida){
 	int i,j;
 	int mayor;
@@ -746,7 +747,7 @@ void SomaRondas (PARTIDA* partida,int* n){
 	}
 }
 
-/*Verifica se existem dois ou mais jogadores na primeira posi√ß√£o, sendo verdade realoca memoria para continuar o jogo
+/*Verifica se existem dois ou mais jogadores na primeira posiÁ„o, sendo verdade realoca memoria para continuar o jogo
 adicionando EXTREAS rondas e devolvendo um valor int[1,0]
 	1 = EMPATE
 	0 = NAO HA EMPATE
@@ -759,7 +760,7 @@ int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 	(*np) = 0;
 	int i,j=1,m;
 	int* n=(int*) malloc(sizeof(int)*(partida->njogadores));            				/////array das somas dos pontos dos jogadores por ordem de como os proprios estao organizados
-	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontua√É¬ßao
+	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontua√ßao
 	jogadoresprimeiro[0]=0;
 
 	SomaRondas(partida,n);
@@ -778,7 +779,7 @@ int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 		}
 	
 	}	
-	if(partida->modoDeJogo==COMPETITIVE && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontua√É¬ßao
+	if(partida->modoDeJogo==COMPETITIVE && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontua√ßao
 	
 		for(m=0;m<partida->njogadores;m++){
 			int aux = partida->players[m].numeroRondas;
@@ -815,6 +816,8 @@ void freeMemoryPartida(PARTIDA *partida){
 		free(partida->players[i].name);
 		free(partida->players[i].pontosRondas);
 		free(partida->players[i].fallos);
+		free(partida->players[i].tentativas);
+		free(partida->players[i].cestos);
 	}
 
 	free(partida->players);
@@ -822,20 +825,20 @@ void freeMemoryPartida(PARTIDA *partida){
 	free(partida);
 }
 
-/*ESTRUTURA para saber guardar a informa√ß√£o do vencedor*/
+/*ESTRUTURA para saber guardar a informaÁ„o do vencedor*/
 typedef struct VENCEDOR{
 	char nome[30];
 	int pontuacao;
 }VENCEDOR;
 
-/*Como extra se os jogadores envolvidos tiverem uma pontua√ß√£o > 0 verifica se bateu um recorde sendo assim guarda a informa√ß√£o
+/*Como extra se os jogadores envolvidos tiverem uma pontuaÁ„o > 0 verifica se bateu um recorde sendo assim guarda a informaÁ„o
 em dois ficheiros HIGHSCORES.data (base de datos) e higscores.json(para mostrar no site)*/
 void listaMelhores(PARTIDA* partida){
 	VENCEDOR * lista=NULL;
 	int contador;
 	int conseguiu=0,m,j,j2,i2;
 
-	FILE * fp2=fopen("Base_de_datos/HIGHSCORES.data","r");
+	FILE * fp2=fopen("libs/Base_de_datos/HIGHSCORES.data","r");
 	if (fp2==NULL) exit(-1);
 		
 	int i;
@@ -887,13 +890,16 @@ void listaMelhores(PARTIDA* partida){
 	}
 	free(n);	
 	
-	FILE * fp=fopen("Base_de_datos/HIGHSCORES.data","r+");
-	if (fp==NULL) exit(-1);	
-	if (conseguiu==1){     
-		FILE *json = fopen("Web/highscores.json","w");           ///////CASO HAJA ALTERACOES, D√Å-SE A NOTICIA MOSTRANDO A "TABELA"               
+	FILE * fp=fopen("libs/Base_de_datos/HIGHSCORES.data","r+");
+	if (fp==NULL) {
+		printf("ERROR\n");
+		exit(-1);	
+	}
+	if (conseguiu==1){            ///////CASO HAJA ALTERACOES, D¡-SE A NOTICIA MOSTRANDO A "TABELA"               
 		system("cls");          
 		printHeader();
-		prints("Ficheiros_de_texto/CONGRATULATIONS.txt");
+		prints("libs/Ficheiros_de_texto/CONGRATULATIONS.txt");
+		FILE *json = fopen("libs/Web/highscores.json","w");    
 		fprintf(json, "highscores= '[" );
 		for	(m=0;m<(tamanho);m++){
 			fprintf(fp,"%s;%d;\n",lista[m].nome,lista[m].pontuacao);
@@ -905,13 +911,14 @@ void listaMelhores(PARTIDA* partida){
 		fprintf(json, "]'");
 		fclose(json);
 	}
-
+	
+	
 	free(lista);
 	fclose(fp);
 	system("pause");
 }
 
-/***********************************************************FUN√áAO PRINCIPAL ONDE DECORRE TODAS AS RONDAS************************************************************/
+/***********************************************************FUN«AO PRINCIPAL ONDE DECORRE TODAS AS RONDAS************************************************************/
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;

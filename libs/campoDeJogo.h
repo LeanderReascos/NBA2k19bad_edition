@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-
+/*Estrutura do campo de jogo Tem os valores nescesarios para o calculo dos lançamentos na partida*/
 typedef struct campoDeJuego
 {
 	char nome[8];
@@ -19,13 +19,14 @@ typedef struct campoDeJuego
 	float g;
 }CAMPO;
 
+/*Adiciona o jogador na posição x y do campo de jogo para mostrar na ecra ao utilizador*/
 void addJugador(float x, float y, char n, CAMPO *campo){
 	int posX,posY;
 	posX = (int) (x*campo->lChar/campo->largo);
 	posY = (int) (y*campo->aChar/campo->ancho);
 	campo->campoDeJuego[posY][posX]=n;
 }
-
+/*Libera memoria*/
 void freeCampo(CAMPO *campo){
 	int i,j;
 	for(i=0; i<campo->lin; i++){
@@ -33,14 +34,14 @@ void freeCampo(CAMPO *campo){
 	}
 	free(campo->campoDeJuego);
 }
-
+/*mostra o campo*/
 void printCampo(CAMPO *campo){
 	int i;
 	for(i=0;i<campo->lin;i++){
 		printf("%s",campo->campoDeJuego[i]);
 	}
 }
-
+/*le a matriz do campo que se encontra no ficheiro campo de jogo*/
 void readCampo(CAMPO *campo){
 	FILE *fp;
 	fp = fopen(campo->file,"r");

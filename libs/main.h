@@ -2,8 +2,7 @@
 #include <conio.h>
 #include "menuSongs.h"
 
-#define PATH "Ficheiros_de_texto/"
-
+#define PATH "libs/Ficheiros_de_texto/"
 
 void prints(char nome[]){                       ///////////print da pergunta
   FILE *fp;
@@ -26,7 +25,7 @@ void freeMemoryMain(char **main, int n){
   
 void printHeader(){
   FILE *fp;
-  fp = fopen("Ficheiros_de_texto/header","r");
+  fp = fopen("libs/Ficheiros_de_texto/header","r");
 
   char buffer[200];
   while(fgets(buffer,sizeof(buffer),fp)){
@@ -50,7 +49,7 @@ void printtext(int n,char file[],int a){
 }
 
 void printTextTo(int line){
-  char file[] = "Ficheiros_de_texto/subHeaders";
+  char file[] = "libs/Ficheiros_de_texto/subHeaders";
   FILE *fp = fopen(file,"r");
   if(fp == NULL) 
     exit(-1);

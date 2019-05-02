@@ -132,24 +132,24 @@ void selectMenu(int n,int v[]){
 			case CASUAL:
 				system("cls");
 				printHeader();
-				printtext(CASUAL,"Ficheiros_de_texto/modesVisual",7);
-				printtext(a,"Ficheiros_de_texto/numberSelect",8);
-				printtext(v[CASUAL-1]+2,"Ficheiros_de_texto/numberSelect",8);
+				printtext(CASUAL,"libs/Ficheiros_de_texto/modesVisual",7);
+				printtext(a,"libs/Ficheiros_de_texto/numberSelect",8);
+				printtext(v[CASUAL-1]+2,"libs/Ficheiros_de_texto/numberSelect",8);
 				ans = selectNumber(&v[CASUAL-1]);
 				break;
 			case COMPETITIVE:
 				system("cls");
 				printHeader();
-				printtext(COMPETITIVE,"Ficheiros_de_texto/modesVisual",7);
-				printtext(a,"Ficheiros_de_texto/numberSelect",8);
-				printtext(v[COMPETITIVE-1]+2,"Ficheiros_de_texto/numberSelect",8);
+				printtext(COMPETITIVE,"libs/Ficheiros_de_texto/modesVisual",7);
+				printtext(a,"libs/Ficheiros_de_texto/numberSelect",8);
+				printtext(v[COMPETITIVE-1]+2,"libs/Ficheiros_de_texto/numberSelect",8);
 				ans = selectNumber(&v[COMPETITIVE-1]);
 				break;
 			default:
 				system("cls");
 				printHeader();
-				printtext(SUDDEN_DEATH,"Ficheiros_de_texto/modesVisual",7);
-				printtext(a,"Ficheiros_de_texto/numberSelect",8);
+				printtext(SUDDEN_DEATH,"libs/Ficheiros_de_texto/modesVisual",7);
+				printtext(a,"libs/Ficheiros_de_texto/numberSelect",8);
 				printf("\n\tno can't be changed'\n");
 				system("pause");
 				break;

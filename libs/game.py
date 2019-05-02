@@ -2,7 +2,7 @@ import pygame
 import sys
 import random
 
-path = "MUSICAS\\"
+path = "libs\\MUSICAS\\"
 
 def pmusic(pos,nmusics,files):
     pygame.init()

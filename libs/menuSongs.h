@@ -23,32 +23,34 @@ int leCommand(FILE * file){
 
 void Musica(char letra){
 	FILE * file2;
-	file2=fopen("MUSICAS/.commands","r");
+	file2=fopen("libs/MUSICAS/.commands","r");
 	if(file2==NULL){
 		printf("Commands didn't open'\n");
 		//exit(-1);
 	}
-	switch (letra){
-		case 'p':
+	char c[10];
+	strcpy(c,strupr(&letra));
+	switch (c[0]){
+		case 'P':
 				if(leCommand(file2)){
-					file2=fopen("MUSICAS/.commands","w");
+					file2=fopen("libs/MUSICAS/.commands","w");
 				    fprintf(file2,"%s","pause");
 				}
 				else if(leCommand(file2)==0){
-					file2=fopen("MUSICAS/.commands","w");
+					file2=fopen("libs/MUSICAS/.commands","w");
 				    fprintf(file2,"%s","play");
 				}
 				break;	
-		case 'n':
-				file2=fopen("MUSICAS/.commands","w");
+		case 'N':
+				file2=fopen("libs/MUSICAS/.commands","w");
                 fprintf(file2,"%s","next");
 				break;
-		case 'b':
-				file2=fopen("MUSICAS/.commands","w");
+		case 'B':
+				file2=fopen("libs/MUSICAS/.commands","w");
 	    		fprintf(file2,"%s","before");
 				break;
-		case 's':
-    	       file2=fopen("MUSICAS/.commands","w");
+		case 'S':
+    	       file2=fopen("libs/MUSICAS/.commands","w");
                fprintf(file2,"%s","stop");
 			break;
 }

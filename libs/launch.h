@@ -46,6 +46,7 @@ typedef struct bola{
 	float vAni;
 }BOLA;
 
+/*Libera memoria da matriz que mostra a parabola*/
 void freeMatriz(char **m,int lin){
 	int i;
 	for(i=0; i<lin; i++){
@@ -53,13 +54,13 @@ void freeMatriz(char **m,int lin){
 	}
 	free(m);
 }
-
+/*Gera valores random, nescesaria para as funções q precisam valores float random entre um float min e outro max*/
 float random(float min, float max){
-	
 	float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
     return min + scale * ( max - min ); 
 }
 
+/*gera o obstaculo em função de uma variavel aux (bola->aux)*/
 void geraObstaculo(BOLA* bola){
 	switch (bola->aux){
 			case 0:                 //    sem obstaculo
@@ -80,16 +81,10 @@ void geraObstaculo(BOLA* bola){
 				else{
 						bola->obstaculo.ax=random(-7,0);
 				}
-				
-			
-				
-				
 				bola->obstaculo.ymax=random(0,1);                        
 				bola->obstaculo.vd=random(3,10);
 				bola->obstaculo.teta=random(0,pi/2);
 				bola->obstaculo.ay=random(2,7);
-
-
 				break;
 
 			case 3:				//drone com movimento harmonnico
@@ -97,28 +92,23 @@ void geraObstaculo(BOLA* bola){
 				bola->obstaculo.ymax=random(0,2)+hCesto;                         ///altura maxima do drone que se move na vertical-AMPLITUDE DO MOVIMENTO HARMONICO*2
 				bola->obstaculo.teta=random(2*pi, 6*pi);                                 //usamos o teta neste caso para definir a frequancia angular do movimento
 			break;
-
-
 	}
 }
 
-
+/*Função q verifica se naquele instante a bola se encontra na posição proxima do cesto 
+se se encontra numa area de diametroCesto/2 e a posição em y (bola->y) > hCesto*/
 void verificaCesto(BOLA *bola){
 	int enX = bola->x <= bola->distCesto+(diametroCesto/2) && bola->x >= bola->distCesto-(diametroCesto/2);
 	int enY = bola->y <= hCesto+(diametroCesto/2) && bola->y >= hCesto-(diametroCesto/2);
-
 	int beY =  bola->y > hCesto;
-	//printf("X> %f EnX> %d EnY> %d BeY> %d Y> %f BEFORE> %d CESTO> %d\n",bola->x, enX,enY,beY,bola->y,enX && beY,enX && enY && bola->before);
 	if(enX && beY){
-		//printf("Ant\n");
 		bola->before = 1;
 	}
 	if(enX && enY && bola->before){
-		//printf("cesto\n");
 		bola->cesto = 1;
 	}
 }
-
+/*Calcula as posições da bola e dos obstaculos se é requerido em função do tempo, usando as equações de movimento*/
 void launch_time(BOLA *bola, float t){
 	bola->x = bola->v*cos(bola->ang)*t;
 	bola->y = bola->h0 + bola->v*sin(bola->ang)*t -(float)(0.5*bola->g*pow(t,2));
@@ -143,6 +133,7 @@ void launch_time(BOLA *bola, float t){
 	verificaCesto(bola);
 }
 
+/*Mostra a matriz da parabola*/
 void printMatriz(char **m,int sizeLinhas,int sizeColumna){
 	int i,j;
 	system("cls");
@@ -154,6 +145,7 @@ void printMatriz(char **m,int sizeLinhas,int sizeColumna){
 	 }
 }
 
+/*Plot da grafica da parabola com o cesto e os obstaculas uasando o gnuplot*/
 void printParabola(BOLA *bola){
 	FILE *gp;
     gp = popen(GNUPLOT, "w");
@@ -172,12 +164,13 @@ void printParabola(BOLA *bola){
     fclose(gp);
 
 }
-
+/*coloca os valore iniciais a 0*/
 void newBola(BOLA *bola){
 	bola->cesto = 0;
 	bola->before = 0;
 }
 
+/*Exporta as posições do cesto a um ficheiro para depois mostrar com o gnuplot*/
 void cestoDesign(float distCesto){
 	FILE *cesto;
 		cesto = fopen("cesto", "w");
@@ -194,6 +187,7 @@ void cestoDesign(float distCesto){
 	fclose(cesto);
 }
 
+/*Calcula as posições da bola e obstaculos em cada tempo na matriz e faz o lançamento mostrando a animaçao se requerido*/
 void parabola(BOLA *bola){
 	newBola(bola);
 	 bola->hMax = 1+(bola->h0+pow((bola->v*sin(bola->ang)),2)/(2*bola->g));

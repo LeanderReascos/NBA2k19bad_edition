@@ -9,8 +9,8 @@ void novoJogador(){ ///CICLO VICIADO SÓ SAI CASO VALIDAR=0 QUE SE TORNA 1 QUAND
 	do{  	
 		system("cls");
 		printHeader();
-  		prints("Ficheiros_de_texto/novojogador.txt");
-		printtext(numero+2,"Ficheiros_de_texto/numberSelect",8);
+  		prints("libs/Ficheiros_de_texto/novojogador.txt");
+		printtext(numero+2,"libs/Ficheiros_de_texto/numberSelect",8);
 		ans = selectNumber(&numero);
 	}
 	while(ans != 0);
@@ -20,8 +20,8 @@ void novoJogador(){ ///CICLO VICIADO SÓ SAI CASO VALIDAR=0 QUE SE TORNA 1 QUAND
  	int n,i;
  	FILE *fp;
  	FILE *text;
- 	fp=fopen("Base_de_datos/Jogadores.data","a");
- 	text = fopen("Ficheiros_de_texto/Jogadores","a");
+ 	fp=fopen("libs/Base_de_datos/Jogadores.data","a");
+ 	text = fopen("libs/Ficheiros_de_texto/Jogadores","a");
 	if (fp==NULL || text==NULL)
 		exit(-1);
 	
@@ -31,19 +31,23 @@ void novoJogador(){ ///CICLO VICIADO SÓ SAI CASO VALIDAR=0 QUE SE TORNA 1 QUAND
 	n=numero;
 	int validar=0;
 	for (i=1;i<=n;i++){
+	
 		while (1){
+		//	nome=(char*) malloc(100*sizeof(char));
+		//	system("pause");
 			validar=0;
 			system("cls");
 			printHeader();
 			printf ("\n");
-		    printf ("What's your player name? \n 	"); 
+			printtext(1,"libs/Ficheiros_de_texto/novojogador2",17);
+			printf("\t\t\t\t");
 		    scanf (" %[^\n]%*c", nome);
 		     
 		     /////VERIFICACAO SE JÁ EXISTE JOGADOR
 		     /////LER O FICHEIRO
 		     
 			FILE *fp2;
-			fp2 = fopen("Base_de_datos/Jogadores.data","r");
+			fp2 = fopen("libs/Base_de_datos/Jogadores.data","r");
 
 		  	if(fp2==NULL) exit(-1);
 
@@ -61,20 +65,26 @@ void novoJogador(){ ///CICLO VICIADO SÓ SAI CASO VALIDAR=0 QUE SE TORNA 1 QUAND
 		  	fclose(fp2);
 		  
 		 	if (validar==0)
+		 	
 		  		break;
 		  	
 		  	system("cls");
 		 	printHeader();
 		 	printf("That player already exists.Please insert a different player name.\n");
 		 	system("pause");
+		 
 	     
 		}
 	    system("cls");
 		printHeader();
-	    printf("What's your heigh? \n 	");
+		printf("\n");
+		printtext(2,"libs/Ficheiros_de_texto/novojogador2",17);
+	   // printf("What's your heigh? \n 	");
+	   printf("\t\t\t\t");
 	 	scanf ("%f",&altura);
 	    fprintf(fp,"%s-%.2f\n", nome,altura); 
 	    fprintf(text,"%s-%.2f\n", nome,altura);
+
     }
 
 	fclose(fp);

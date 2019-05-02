@@ -1,7 +1,7 @@
 from moviepy.editor import *
 import pygame
 import os
-path = "VIDEOS\\"
+path = "libs\\VIDEOS\\"
 
 def playVideo(video):
 	pygame.display.set_caption('NBA2K19_BadEdition')

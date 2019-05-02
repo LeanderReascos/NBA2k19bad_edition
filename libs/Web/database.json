@@ -1,2 +1,2 @@
 partidaValues = '{"nr":3,"nj":1,"t":3}'
-data = '[{"name":"Michael Jordan", "height": 1.98,"NumeroRondas": 3,"rondas":[{"pontos":3,"tentativas":3,"cestos":1},{"pontos":0,"tentativas":3,"cestos":0},{"pontos":0,"tentativas":3,"cestos":0}]}]'
+data = '[{"name":"Michael Jordan", "height": 1.98,"NumeroRondas": 3,"rondas":[{"pontos":0,"tentativas":3,"cestos":0},{"pontos":0,"tentativas":3,"cestos":0},{"pontos":0,"tentativas":3,"cestos":0}]}]'

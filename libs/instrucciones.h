@@ -1,4 +1,4 @@
-#define MANUAL "Ficheiros_de_texto/instrucoes.txt"
+#define MANUAL "libs/Ficheiros_de_texto/instrucoes.txt"
 
 void instructions(){
 	system("cls");

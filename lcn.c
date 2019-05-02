@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "main.h"
-#include "partida.h"
-#include "novojogador.h"
+#include "libs/main.h"
+#include "libs/partida.h"
+#include "libs/novojogador.h"
 #include <time.h>
-#include "instrucciones.h"
+#include "libs/instrucciones.h"
 
 #define NUEVOJUEGO 1
 #define EXIT 6
@@ -13,19 +13,10 @@
 #define INSTRUCCIONES 3
 #define SETTINGS 4
 
-void adicionarjugadores(PARTIDA *partida){
-	int i,x;
-	for(i=0; i<partida->njogadores; i++){
-		x = valueSelect("Jogadores");
-		if(x != 0){
-			readPlayer(&partida->players[i],x);
-		}
-	}
-}
-
+/*Abre o reprodutor de musica feito em python*/
 void openMusic(){
 	FILE * file;
-	file=fopen("MUSICAS/.commands","w");
+	file=fopen("libs/MUSICAS/.commands","w");
 	if(file==NULL){
 		printf("Commands didn't open'\n");
 		exit(-1);
@@ -40,12 +31,12 @@ void openMusic(){
             "This program needs python to function fully, please install it.\n");  
         exit(0);
     }
-    fprintf(py, "exec(open('game.py').read())");
+    fprintf(py, "exec(open('libs/game.py').read())");
 
     fclose(py);
 }
 
-
+/*Função main onde espera a seleção do utilizador para ingresar em alguma opção do menu*/
 int main(int argc, char const *argv[])
 {
 	openMusic();
@@ -59,7 +50,7 @@ int main(int argc, char const *argv[])
 		op = mainSelect("main");
 		switch(op){
 			case WEB:
-				system("start Web/index.html");
+				system("start libs/Web/index.html");
 				break;
 			case SETTINGS:
 				do{
@@ -106,7 +97,7 @@ int main(int argc, char const *argv[])
 		}	
 		
 	}
-	while(op != 0 && op!=EXIT );
+	while(op != 0 && op!=EXIT ); //Nunca sai unicamente se carrega no ESC ou seleciona a função exit
 	
 	return 0;
 }
