@@ -20,7 +20,7 @@ typedef struct jogador{
 	//Base de datos
 	char *name;
 	float altura;
-	//posiÁ„o
+	//posi√ß√£o
 	float posX;
 	float posY;
 	int zona;
@@ -74,8 +74,8 @@ void setsDefault(PARTIDA *partida){
 	partida->settings.nT[1] = 3; //tentativas competitive
 	partida->settings.nT[2] = 1; //muerteSubita
 }
-/***********************************************************FUN«OES PARA A CRIA«¬O DA PARTIDA************************************************************/
-/*CriaÁ„o da partida*/
+/***********************************************************FUN√áOES PARA A CRIA√á√ÇO DA PARTIDA************************************************************/
+/*Cria√ß√£o da partida*/
 
 void NEWGAME(PARTIDA *partidanova,int opcao){
 	srand((unsigned int)time(NULL));
@@ -196,7 +196,7 @@ void adicionarjugadores(PARTIDA *partida){
 		}
 	}
 }
-/*Gera uma pisiÁ„o aleartoria em funÁao de um n[1,3] sendo as respetivas areas de jogo 
+/*Gera uma pisi√ß√£o aleartoria em fun√ßao de um n[1,3] sendo as respetivas areas de jogo 
 	n=1 Corresponde a area mais proxima do cesto (The Paint)
 	n=2 A area que esta entre a area dos 3 pontos e a mais proxima
 	n=3 A area dos 3 pontos*/
@@ -254,7 +254,7 @@ void gerarPosicoes(PLAYER* jogador,CAMPO* campo,int n){
 }
 
 
-/*Gera a posiÁ„o aleartoria inicial para todos os jogadores dependendo de um n[1,3]*/
+/*Gera a posi√ß√£o aleartoria inicial para todos os jogadores dependendo de um n[1,3]*/
 void posRandomRonda(PARTIDA *partida, int n){
 	int i;
 	readCampo(&partida->campo);
@@ -306,9 +306,9 @@ void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
 
 }
 
-/***********************************************************FUN«OES PARA A MOSTRAR OS VALORES DO JOGO************************************************************/
+/***********************************************************FUN√áOES PARA A MOSTRAR OS VALORES DO JOGO************************************************************/
 
-/*FunÁ„o que serve para imprimir os valores formatados do PLAYER */
+/*Fun√ß√£o que serve para imprimir os valores formatados do PLAYER */
 void printPlayer(PLAYER *player){
 	int i;
 	int n = strlen(player->name);
@@ -324,7 +324,7 @@ void printPlayer(PLAYER *player){
 	printf("|\n");
 }
 
-/*Mostra o cabeÁalho dos valores de cada ronda desta maneira com n o numero de ronda:
+/*Mostra o cabe√ßalho dos valores de cada ronda desta maneira com n o numero de ronda:
 | No |          NAME          |  HEIGHT  |  ROUND n  |  TRIES  |*/
 void printEncabezado(int n){
 	int i;
@@ -339,8 +339,8 @@ void printEncabezado(int n){
 	printf("\n");
 }
 
-/*Mostra na ecra os valores de toda a partida, Campo de jogo com as posiÁıes dos jogadores e os valores de cada jogador
-Utilizando as funÁıes anteriores para isso*/
+/*Mostra na ecra os valores de toda a partida, Campo de jogo com as posi√ß√µes dos jogadores e os valores de cada jogador
+Utilizando as fun√ß√µes anteriores para isso*/
 void printPartida(PARTIDA *partida){
 	system("cls");
 	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
@@ -364,9 +364,9 @@ void printPartida(PARTIDA *partida){
 
 }
 
-/***********************************************************FUN«OES PARA EXPORTAR OS RESULTADOS DO JOGO************************************************************/
+/***********************************************************FUN√áOES PARA EXPORTAR OS RESULTADOS DO JOGO************************************************************/
 
-/*Exporta a informaÁ„o de cada jogador aos dos ficheiros correspondentes*/
+/*Exporta a informa√ß√£o de cada jogador aos dos ficheiros correspondentes*/
 void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	int i;
 	int n = strlen(player->name);
@@ -393,7 +393,7 @@ void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	fprintf(info,"|   %.1f   |\n",per*100);
 }
 
-/*Mostrar ficheiros de texto no programa para ter uma melhor apresentaÁ„o*/
+/*Mostrar ficheiros de texto no programa para ter uma melhor apresenta√ß√£o*/
 void fprintText(int n,char file[100],int a, FILE *info){
 	FILE *fp;
 	fp = fopen(file,"r");
@@ -409,7 +409,7 @@ void fprintText(int n,char file[100],int a, FILE *info){
 	fclose(fp);
 }
 
-/*Exporta a informaÁ„o da partida para dois ficheiros um .txt(mostrar em texto plano os resultados) 
+/*Exporta a informa√ß√£o da partida para dois ficheiros um .txt(mostrar em texto plano os resultados) 
 e um .json(cria uma base de datos para ser usada na pagina web)*/
 void informacao(PARTIDA *partida){
 	char name[100];
@@ -476,10 +476,10 @@ void exitGame(int v,PARTIDA *partida){
 }
 
 
-/***********************************************************FUN«OES QUE DECORREM O JOGO DA PARTIDA************************************************************/
+/***********************************************************FUN√áOES QUE DECORREM O JOGO DA PARTIDA************************************************************/
 
-/*Nesta funÁ„o sao utilizadas funÁıes do ficheiro valoreslaunch.h (para inserir os valores respetivos a cada lanÁamento)
-e a funÁao launch.h (para fazer o lanÁamento de cada bola)*/
+/*Nesta fun√ß√£o sao utilizadas fun√ß√µes do ficheiro valoreslaunch.h (para inserir os valores respetivos a cada lan√ßamento)
+e a fun√ßao launch.h (para fazer o lan√ßamento de cada bola)*/
 void runRonda(PARTIDA *partida, int j,int i, int k){
 	system("cls");
 	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
@@ -536,7 +536,7 @@ void runRonda(PARTIDA *partida, int j,int i, int k){
 			
 }
 
-/***********************************************************FUN«OES PYTHON************************************************************/
+/***********************************************************FUN√áOES PYTHON************************************************************/
 
 /*Variavel auxiliar para controlo dos ficheiros de video de acordo a validade do cesto*/
 void cestoAux(PLAYER *player, int n){
@@ -552,7 +552,7 @@ void cestoAux(PLAYER *player, int n){
 		fprintf(file2, "haha");
 	fclose(file2);
 }
-/*Abre e reproduz em segundo plano as funÁıes de python que mostram os videos*/
+/*Abre e reproduz em segundo plano as fun√ß√µes de python que mostram os videos*/
 void cesto(){
 	FILE *py;
     py = popen("py", "w");
@@ -566,9 +566,9 @@ void cesto(){
     fclose(py);
 }
 
-/***********************************************************FUN«OES QUE VERIFICAM O ESTADO DA PARTIDA************************************************************/
+/***********************************************************FUN√áOES QUE VERIFICAM O ESTADO DA PARTIDA************************************************************/
 
-/*Soma os ontos ao jogador de acordo a ronda e se apresenta o bonus, tudo isto em funÁ„o da zona*/
+/*Soma os ontos ao jogador de acordo a ronda e se apresenta o bonus, tudo isto em fun√ß√£o da zona*/
 void somaPontos(PLAYER * player,int n,int aux){	
 	switch(player->zona){
 		case 1:
@@ -598,7 +598,7 @@ void somaPontos(PLAYER * player,int n,int aux){
 	}
 }
 
-/* Muda de posiÁ„o do jogador em funÁ„o ao modo de jogo, posiÁ„o atual e se foi ou nao cesto o lanÁamento 
+/* Muda de posi√ß√£o do jogador em fun√ß√£o ao modo de jogo, posi√ß√£o atual e se foi ou nao cesto o lan√ßamento 
 SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L/2^2+C^2)
 SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(A 1 METRO DO CESTO) DEVE MANTER ESSA POSICAO      MINIMO=1*/
 void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                                                           ///////////////////////////////////////////////DIFERENCA
@@ -645,8 +645,8 @@ void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                   
 	}
 }
 
-/*Depois de ser executado o lanÁamento verifica se este foi cesto ou nao, para isto utiliza os valores antes ja calculados
-no lanÁamento (funÁoes de launch.h)*/
+/*Depois de ser executado o lan√ßamento verifica se este foi cesto ou nao, para isto utiliza os valores antes ja calculados
+no lan√ßamento (fun√ßoes de launch.h)*/
 int confirmRonda(PARTIDA *partida, int j,int i){
 	int aux = 1;
 
@@ -695,7 +695,7 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 	return aux;
 }
 
-/***********************************************************FUN«OES AUXILIARES************************************************************/
+/***********************************************************FUN√áOES AUXILIARES************************************************************/
 /*Conta os pontos totais de um PLAYER*/
 void resultado(PLAYER *player){
 	int i;
@@ -706,7 +706,7 @@ void resultado(PLAYER *player){
 	player->total = soma;
 }
 
-/*Ordena aos jogadores do melhor ao menor em funÁ„o dos seus pontos*/
+/*Ordena aos jogadores do melhor ao menor em fun√ß√£o dos seus pontos*/
 void ordenar(PARTIDA *partida){
 	int i,j;
 	int mayor;
@@ -746,7 +746,7 @@ void SomaRondas (PARTIDA* partida,int* n){
 	}
 }
 
-/*Verifica se existem dois ou mais jogadores na primeira posiÁ„o, sendo verdade realoca memoria para continuar o jogo
+/*Verifica se existem dois ou mais jogadores na primeira posi√ß√£o, sendo verdade realoca memoria para continuar o jogo
 adicionando EXTREAS rondas e devolvendo um valor int[1,0]
 	1 = EMPATE
 	0 = NAO HA EMPATE
@@ -759,7 +759,7 @@ int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 	(*np) = 0;
 	int i,j=1,m;
 	int* n=(int*) malloc(sizeof(int)*(partida->njogadores));            				/////array das somas dos pontos dos jogadores por ordem de como os proprios estao organizados
-	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontua√ßao
+	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontua√É¬ßao
 	jogadoresprimeiro[0]=0;
 
 	SomaRondas(partida,n);
@@ -778,7 +778,7 @@ int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
 		}
 	
 	}	
-	if(partida->modoDeJogo==COMPETITIVE && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontua√ßao
+	if(partida->modoDeJogo==COMPETITIVE && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontua√É¬ßao
 	
 		for(m=0;m<partida->njogadores;m++){
 			int aux = partida->players[m].numeroRondas;
@@ -822,13 +822,13 @@ void freeMemoryPartida(PARTIDA *partida){
 	free(partida);
 }
 
-/*ESTRUTURA para saber guardar a informaÁ„o do vencedor*/
+/*ESTRUTURA para saber guardar a informa√ß√£o do vencedor*/
 typedef struct VENCEDOR{
 	char nome[30];
 	int pontuacao;
 }VENCEDOR;
 
-/*Como extra se os jogadores envolvidos tiverem uma pontuaÁ„o > 0 verifica se bateu um recorde sendo assim guarda a informaÁ„o
+/*Como extra se os jogadores envolvidos tiverem uma pontua√ß√£o > 0 verifica se bateu um recorde sendo assim guarda a informa√ß√£o
 em dois ficheiros HIGHSCORES.data (base de datos) e higscores.json(para mostrar no site)*/
 void listaMelhores(PARTIDA* partida){
 	VENCEDOR * lista=NULL;
@@ -890,7 +890,7 @@ void listaMelhores(PARTIDA* partida){
 	FILE * fp=fopen("Base_de_datos/HIGHSCORES.data","r+");
 	if (fp==NULL) exit(-1);	
 	if (conseguiu==1){     
-		FILE *json = fopen("Web/highscores.json","w");           ///////CASO HAJA ALTERACOES, D¡-SE A NOTICIA MOSTRANDO A "TABELA"               
+		FILE *json = fopen("Web/highscores.json","w");           ///////CASO HAJA ALTERACOES, D√Å-SE A NOTICIA MOSTRANDO A "TABELA"               
 		system("cls");          
 		printHeader();
 		prints("Ficheiros_de_texto/CONGRATULATIONS.txt");
@@ -911,7 +911,7 @@ void listaMelhores(PARTIDA* partida){
 	system("pause");
 }
 
-/***********************************************************FUN«AO PRINCIPAL ONDE DECORRE TODAS AS RONDAS************************************************************/
+/***********************************************************FUN√áAO PRINCIPAL ONDE DECORRE TODAS AS RONDAS************************************************************/
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;
