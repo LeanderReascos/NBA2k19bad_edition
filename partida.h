@@ -14,6 +14,8 @@
 #define SUDDEN_DEATH 3
 #define MINIMO 1
 
+/*Estruturas nescesarias*/
+
 typedef struct jogador{
 	//Base de datos
 	char *name;
@@ -58,6 +60,7 @@ typedef struct planeta{
 	
 }PLANETA;
 
+/*Valores por default para o decorrer do jogo*/
 void setsDefault(PARTIDA *partida){
 	partida->settings.musica = false;
 	partida->settings.videos  = false;
@@ -71,267 +74,8 @@ void setsDefault(PARTIDA *partida){
 	partida->settings.nT[1] = 3; //tentativas competitive
 	partida->settings.nT[2] = 1; //muerteSubita
 }
-
-void resultado(PLAYER *player){
-	int i;
-	int soma = 0;
-	for(i=0; i<player->numeroRondas; i++){
-		soma += player->pontosRondas[i];
-	}
-	player->total = soma;
-}
-
-
-void SomaRondas (PARTIDA* partida,int* n){
-	int soma,i,j;
-	
-	for(i=0;i<partida->njogadores;i++){
-		resultado(&partida->players[i]);
-		n[i]=partida->players[i].total;
-	
-	}
-	
-	
-}
-
-int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
-{
-	int res = 0;
-	(*np) = 0;
-	int i,j=1,m;
-	int* n=(int*) malloc(sizeof(int)*(partida->njogadores));            				/////array das somas dos pontos dos jogadores por ordem de como os proprios estao organizados
-	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontua√ßao
-	jogadoresprimeiro[0]=0;
-
-	SomaRondas(partida,n);
-	int maior=n[0];
-	for(i=1;i<partida->njogadores;i++){
-		if(n[i]>maior){
-			maior=n[i];
-			j=1;
-			jogadoresprimeiro=(int*) realloc(jogadoresprimeiro,sizeof(int)*j);
-			jogadoresprimeiro[0]=i;
-		}
-		else if(n[i]==maior){
-			j++;
-			jogadoresprimeiro=(int*) realloc(jogadoresprimeiro,sizeof(int)*j);
-			jogadoresprimeiro[j-1]=i;
-		}
-	
-	}	
-	if(partida->modoDeJogo==2 && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontua√ßao
-	
-		for(m=0;m<partida->njogadores;m++){
-			int aux = partida->players[m].numeroRondas;
-			(*lastronda) = aux;
-
-			partida->players[m].numeroRondas+=extras;             			//////aumento do numero de rondas usando o vetor jogadoresprimeiro porque guarda os indices dos jogadores que estejam nesta situacao
-			partida->players[m].pontosRondas=(int*) realloc(partida->players[m].pontosRondas,sizeof(int)*(partida->players[m].numeroRondas)); 
-			partida->players[m].fallos=(int*) realloc(partida->players[m].fallos,sizeof(int)*(partida->players[m].numeroRondas)); 
-			partida->players[m].cestos=(int*) realloc(partida->players[m].cestos,sizeof(int)*(partida->players[m].numeroRondas)); 
-			partida->players[m].tentativas=(int*) realloc(partida->players[m].tentativas,sizeof(int)*(partida->players[m].numeroRondas)); 
-			res = 1;
-			if(partida->players[m].pontosRondas == NULL || partida->players[m].fallos == NULL)
-					exit(-1);
-			int k;
-			for(k=0; k<extras; k++){
-				partida->players[m].pontosRondas[aux+k] = 0;
-				partida->players[m].fallos[aux+k] = 0;
-				partida->players[m].cestos[aux+k] = 0;
-				partida->players[m].tentativas[aux+k] = 0;
-			}
-		}
-
-	}
-	(*np) = j;
-	free(n);
-	free(jogadoresprimeiro);
-	if(res)			partida->nRondas+=2;  
-	return res;
-	
-}
-
-void gerarPosicoes(PLAYER* jogador,CAMPO* campo,int n){
-
-	//LIMITES ZONA 1
-	float xmin1=(5.05/15)*(campo->largo);
-	float xmax1=(campo->largo)-xmin1;
-
-	float rquadrado=pow((2.45/15)*(campo->largo),2);
-
-
-	//LIMITES ZONA 2
-
-	float xmin2=0.9/15*(campo->largo);
-	float xmax2=(campo->largo)-xmin2;
-	float a=-8.95/14*(campo->ancho)/pow((xmin2-(campo->largo)/2),2);
-
-
-
-
-
-	switch (n){
-		case 1:
-
-
-			jogador->posX=random(xmin1,xmax1);
-			float xcesto1=(campo->largo)/2-1;
-			float xcesto2=(campo->largo)/2+1;
-
-
-			float xlinha=fabs((campo->largo)/2-(jogador->posX));	                                        //temos que o ylinha da circunferencia  igual a sqrt de (rquadrado-xlinha^2)
-			float ymax=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha,2)) ;
-
-
-		if(((jogador->posX)>xcesto1 ) && ((jogador->posX)<xcesto2)){
-			float ymin=(8.57/100)*(campo->ancho)+sqrt(1-pow(xlinha,2));
-			jogador->posY=random(ymin,ymax);
-
-
-		}
-
-		else{
-
-			jogador->posY=random(8.57/100*(campo->ancho),ymax);
-		}
-			break;
-
-
-		case 2:
-
-			jogador->posX=random(xmin2,xmax2);
-			float xlinha2=fabs((campo->largo)/2-(jogador->posX));
-			float ymin2=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha2,2)) ;                                          //zona 1 para os casos em que x "esta dentro desta"
-
-			float ymax2=a*pow(((jogador->posX)-(campo->largo)/2),2)+8.95/14*(campo->ancho);
-
-
-			if((jogador->posX)>xmin1 &&((jogador->posX)<xmax1)){
-				jogador->posY=random(ymin2,ymax2);
-			}
-			else{
-				jogador->posY=random(((8.57/100)*(campo->ancho)),ymax2);}
-			break;
-
-		case 3:
-		    jogador->posX=random(0,campo->largo);
-
-
-			float ymin=a*pow(((jogador->posX)-(campo->largo)/2),2)+8.95/14*(campo->ancho);               
-
-			do{
-			if(((jogador->posX)>xmin2)&&((jogador->posX)<xmax2))
-			{
-				jogador->posY=random(ymin,campo->ancho);
-			}
-
-			else{
-				jogador->posY=random((8.57/100)*(campo->ancho),campo->ancho);
-			}
-			}while((jogador->posY)<(8.57/100)*(campo->ancho));
-
-			break;	
-	}	
-}
-
-
-
-
-void readPlayer(PLAYER *player,int n){
-	int i = 0,j;
-	FILE *fp;
-	fp = fopen("Base_de_datos/Jogadores.data","r");
-	if(fp == NULL){
-		printf("Error ler jogador\n");
-		exit(-1);
-	}
-	j = 0;
-	char buffer[100];
-	char *token;
-	while(fgets(buffer,sizeof(buffer),fp) && i!=n){
-		if(i==n-1){
-			token = strtok(buffer,"-");
-			while(token != NULL){
-				if(j==0){
-					player->name = (char *) malloc(strlen(token)*sizeof(char));
-					strcpy(player->name,token);
-				}
-				else if(j==1)
-					player->altura = atof(token);
-				j++;
-				token = strtok(NULL, "-");
-			}
-		}
-		i++;
-	}
-}
-
-void posRandomRonda(PARTIDA *partida, int n){
-	int i;
-	readCampo(&partida->campo);
-	gerarPosicoes(&partida->players[0],&partida->campo,n);
-	for(i=0; i<partida->njogadores; i++){
-		partida->players[i].bola.bonus = 0;
-		partida->players[i].zona = n;
-		partida->players[i].posX = partida->players[0].posX;
-		partida->players[i].posY = partida->players[0].posY;
-		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
-	}
-}
-
-void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
-	int i,j;
-	partida->modoDeJogo=modoDeJogo;
-	
-	int n;
-
-
-	switch(modoDeJogo){
-		case (CASUAL):
-			n = CASUAL-1;
-			break;
-		case(COMPETITIVE):
-			n = COMPETITIVE -1;
-			break;
-		case(SUDDEN_DEATH):
-			system("color 4f");
-			n = SUDDEN_DEATH-1;
-			break;
-	}
-
-	partida->tentativas = partida->settings.nT[n];
-	for(i=0;i<partida->njogadores;i++){
-		partida->players[i].numeroRondas=	partida->settings.nR[n];
-		partida->nRondas = 	partida->settings.nR[n];
-		partida->players[i].pontosRondas=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
-		partida->players[i].fallos=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
-		partida->players[i].cestos=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
-		partida->players[i].tentativas=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
-		for(j=0; j<partida->players[i].numeroRondas;j++){
-			partida->players[i].pontosRondas[j] = 0;
-			partida->players[i].fallos[j]= 0;
-			partida->players[i].cestos[j]= 0;
-			partida->players[i].tentativas[j]= 0;
-		}
-	}
-
-	posRandomRonda(partida,POSINICIO);
-
-}
-
-
-void freeMemoryPartida(PARTIDA *partida){
-	int i;
-	for(i=0; i < partida->njogadores; i++){
-		free(partida->players[i].name);
-		free(partida->players[i].pontosRondas);
-		free(partida->players[i].fallos);
-	}
-
-	free(partida->players);
-	freeCampo(&partida->campo);
-	free(partida);
-}
+/***********************************************************FUN«OES PARA A CRIA«¬O DA PARTIDA************************************************************/
+/*CriaÁ„o da partida*/
 
 void NEWGAME(PARTIDA *partidanova,int opcao){
 	srand((unsigned int)time(NULL));
@@ -343,9 +87,7 @@ void NEWGAME(PARTIDA *partidanova,int opcao){
 		printf("Error memoria planeta\n");
 		exit(-1);
 	}
-	//printf ("How many players will play this round?\n\t");
 	int nJugadores = 1;
-	//scanf("%d",&nJugadores);
 	int aux;
 	do{
 		system("cls");
@@ -366,8 +108,6 @@ void NEWGAME(PARTIDA *partidanova,int opcao){
 		printf("ERROR\n");
 		exit(-1);
 	} 
-	//fread(planeta,sizeof(PLANETA),opcao,fp);
-	//ler o planeta-NOVA MANEIRA
 
 	int i=0;
 	do{
@@ -416,80 +156,159 @@ void NEWGAME(PARTIDA *partidanova,int opcao){
 	strcpy(partidanova->campo.file,"Ficheiros_de_texto/campo");
 }
 
-void somaPontos(PLAYER * player,int n,int aux){	
-	switch(player->zona){
-		case 1:
-			if(aux==0)
-				player->pontosRondas[n]++;
-			
-			else if(aux==1)
-				player->pontosRondas[n]+=2;
-			
-			break;
-
-		case 2:
-			if(aux==0)
-				player->pontosRondas[n]+=2;
-			
-			else if(aux==1)
-				player->pontosRondas[n]+=3;
-			
-			break;	
-		case 3:
-			if(aux==0)
-				player->pontosRondas[n]+=3;
-				
-			else if(aux==1)
-				player->pontosRondas[n]+=4;
-		break;
+/*Ler os jogadores da base de datos*/
+void readPlayer(PLAYER *player,int n){
+	int i = 0,j;
+	FILE *fp;
+	fp = fopen("Base_de_datos/Jogadores.data","r");
+	if(fp == NULL){
+		printf("Error ler jogador\n");
+		exit(-1);
+	}
+	j = 0;
+	char buffer[100];
+	char *token;
+	while(fgets(buffer,sizeof(buffer),fp) && i!=n){
+		if(i==n-1){
+			token = strtok(buffer,"-");
+			while(token != NULL){
+				if(j==0){
+					player->name = (char *) malloc(strlen(token)*sizeof(char));
+					strcpy(player->name,token);
+				}
+				else if(j==1)
+					player->altura = atof(token);
+				j++;
+				token = strtok(NULL, "-");
+			}
+		}
+		i++;
 	}
 }
 
-void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                                                           ///////////////////////////////////////////////DIFERENCA
-	float distatual2=campo->ancho;
-	float distatual1=0.0;
-	float distoriginal=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
-	float MAXIMO =sqrt(pow(campo->ancho,2)+pow(campo->largo/2,2));
-	/*SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L/2^2+C^2)
-	//SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(A 1 METRO DO CESTO) DEVE MANTER ESSA POSICAO      MINIMO=1*/
-	if(modo != SUDDEN_DEATH){
-		switch(n){
-
-			case 1:                                                        ///////////////////////ZONA MAIS LONGE- USADA PARA A QUANDO MARCA PONTO
-				gerarPosicoes(player,campo,player->zona+1);
-				player->zona++;
-			break;
-
-			case 2:                                            ///////////////////////ZONA MAIS PERTO- USADA PARA A QUANDO PERDE DUAS VEZES SEGUIDAS
-				gerarPosicoes(player,campo,player->zona-1);
-				player->zona--;
-			break;	
-
-			case 3: 
-			    gerarPosicoes(player,campo,player->zona);
-			    distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);                                  ///////////////////////MESMA ZONA MAS MAIS LONGE- USADA PARA QUANDO ESTA  NA ZONA 3 E ACERTA
-				if(!(distoriginal>=MAXIMO-MAXIMO*0.002)){
-					while (distatual1<=distoriginal ){           
-					gerarPosicoes(player,campo,player->zona); 
-					distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
-					}
-				}   
-				break;	
-			
-			case 4:  
-				gerarPosicoes(player,campo,player->zona);  
-				distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);                                    ///////////////////////MESMA ZONA MAS MAIS PERTO- USADA PARA A ZONA 1
-				if(!(distoriginal<=MINIMO+0.1)){
-					while (distatual2>=distoriginal  && distatual2!=MINIMO){
-						gerarPosicoes(player,campo,player->zona);      
-						distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
-					}
-				}
-				break;
+/*Adicionar os jogadores a partida*/
+void adicionarjugadores(PARTIDA *partida){
+	int i,x;
+	for(i=0; i<partida->njogadores; i++){
+		x = valueSelect("Jogadores");
+		if(x != 0){
+			readPlayer(&partida->players[i],x);
 		}
 	}
 }
+/*Gera uma pisiÁ„o aleartoria em funÁao de um n[1,3] sendo as respetivas areas de jogo 
+	n=1 Corresponde a area mais proxima do cesto (The Paint)
+	n=2 A area que esta entre a area dos 3 pontos e a mais proxima
+	n=3 A area dos 3 pontos*/
+void gerarPosicoes(PLAYER* jogador,CAMPO* campo,int n){
+	//LIMITES ZONA 1
+	float xmin1=(5.05/15)*(campo->largo);
+	float xmax1=(campo->largo)-xmin1;
+	float rquadrado=pow((2.45/15)*(campo->largo),2);
+	//LIMITES ZONA 2
+	float xmin2=0.9/15*(campo->largo);
+	float xmax2=(campo->largo)-xmin2;
+	float a=-8.95/14*(campo->ancho)/pow((xmin2-(campo->largo)/2),2);
+	switch (n){
+		case 1:
+			jogador->posX=random(xmin1,xmax1);
+			float xcesto1=(campo->largo)/2-1;
+			float xcesto2=(campo->largo)/2+1;
+			float xlinha=fabs((campo->largo)/2-(jogador->posX));	                                        //temos que o ylinha da circunferencia  igual a sqrt de (rquadrado-xlinha^2)
+			float ymax=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha,2)) ;
+			if(((jogador->posX)>xcesto1 ) && ((jogador->posX)<xcesto2)){
+				float ymin=(8.57/100)*(campo->ancho)+sqrt(1-pow(xlinha,2));
+				jogador->posY=random(ymin,ymax);
+			}
+			else{
+				jogador->posY=random(8.57/100*(campo->ancho),ymax);
+			}
+			break;
 
+		case 2:
+			jogador->posX=random(xmin2,xmax2);
+			float xlinha2=fabs((campo->largo)/2-(jogador->posX));
+			float ymin2=(5.8/14*(campo->ancho))+sqrt(rquadrado-pow(xlinha2,2)) ;                                          //zona 1 para os casos em que x "esta dentro desta"
+ 			float ymax2=a*pow(((jogador->posX)-(campo->largo)/2),2)+8.95/14*(campo->ancho);
+			if((jogador->posX)>xmin1 &&((jogador->posX)<xmax1)){
+				jogador->posY=random(ymin2,ymax2);
+			}
+			else{
+				jogador->posY=random(((8.57/100)*(campo->ancho)),ymax2);}
+			break;
+
+		case 3:
+		    jogador->posX=random(0,campo->largo);
+			float ymin=a*pow(((jogador->posX)-(campo->largo)/2),2)+8.95/14*(campo->ancho);               
+			do{
+				if(((jogador->posX)>xmin2)&&((jogador->posX)<xmax2)){
+					jogador->posY=random(ymin,campo->ancho);
+				}
+
+				else{
+					jogador->posY=random((8.57/100)*(campo->ancho),campo->ancho);
+				}
+			}while((jogador->posY)<(8.57/100)*(campo->ancho));
+			break;	
+	}	
+}
+
+
+/*Gera a posiÁ„o aleartoria inicial para todos os jogadores dependendo de um n[1,3]*/
+void posRandomRonda(PARTIDA *partida, int n){
+	int i;
+	readCampo(&partida->campo);
+	gerarPosicoes(&partida->players[0],&partida->campo,n);
+	for(i=0; i<partida->njogadores; i++){
+		partida->players[i].bola.bonus = 0;
+		partida->players[i].zona = n;
+		partida->players[i].posX = partida->players[0].posX;
+		partida->players[i].posY = partida->players[0].posY;
+		addJugador(partida->players[i].posX,partida->players[i].posY,'I',&partida->campo);
+	}
+}
+/*Permite selecionar o modo de jogo entre Casual Competitive ou Sudden Death*/
+void seleccionarModoDeJogo(PARTIDA *partida, int modoDeJogo){
+	int i,j;
+	partida->modoDeJogo=modoDeJogo;
+	
+	int n;
+	switch(modoDeJogo){
+		case (CASUAL):
+			n = CASUAL-1;
+			break;
+		case(COMPETITIVE):
+			n = COMPETITIVE -1;
+			break;
+		case(SUDDEN_DEATH):
+			system("color 4f");
+			n = SUDDEN_DEATH-1;
+			break;
+	}
+
+	partida->tentativas = partida->settings.nT[n];
+	for(i=0;i<partida->njogadores;i++){
+		partida->players[i].numeroRondas=	partida->settings.nR[n];
+		partida->nRondas = 	partida->settings.nR[n];
+		partida->players[i].pontosRondas=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		partida->players[i].fallos=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		partida->players[i].cestos=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		partida->players[i].tentativas=(int*) malloc(	partida->settings.nR[n]*sizeof(int));
+		for(j=0; j<partida->players[i].numeroRondas;j++){
+			partida->players[i].pontosRondas[j] = 0;
+			partida->players[i].fallos[j]= 0;
+			partida->players[i].cestos[j]= 0;
+			partida->players[i].tentativas[j]= 0;
+		}
+	}
+
+	posRandomRonda(partida,POSINICIO);
+
+}
+
+/***********************************************************FUN«OES PARA A MOSTRAR OS VALORES DO JOGO************************************************************/
+
+/*FunÁ„o que serve para imprimir os valores formatados do PLAYER */
 void printPlayer(PLAYER *player){
 	int i;
 	int n = strlen(player->name);
@@ -505,7 +324,8 @@ void printPlayer(PLAYER *player){
 	printf("|\n");
 }
 
-
+/*Mostra o cabeÁalho dos valores de cada ronda desta maneira com n o numero de ronda:
+| No |          NAME          |  HEIGHT  |  ROUND n  |  TRIES  |*/
 void printEncabezado(int n){
 	int i;
 	printf("| No |          NAME          |  HEIGHT  |");
@@ -519,7 +339,8 @@ void printEncabezado(int n){
 	printf("\n");
 }
 
-
+/*Mostra na ecra os valores de toda a partida, Campo de jogo com as posiÁıes dos jogadores e os valores de cada jogador
+Utilizando as funÁıes anteriores para isso*/
 void printPartida(PARTIDA *partida){
 	system("cls");
 	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
@@ -543,29 +364,9 @@ void printPartida(PARTIDA *partida){
 
 }
 
+/***********************************************************FUN«OES PARA EXPORTAR OS RESULTADOS DO JOGO************************************************************/
 
-
-void ordenar(PARTIDA *partida){
-	int i,j;
-	int mayor;
-	PLAYER player;
-	for(i=0; i<partida->njogadores; i++){
-		resultado(&partida->players[i]);
-	}
-
-	for(i=0; i<partida->njogadores; i++){
-		mayor = i;
-		for(j=i; j<partida->njogadores; j++){
-			if(partida->players[j].total>partida->players[i].total)
-				mayor = j;
-		}
-		player = partida->players[i];
-		partida->players[i] = partida->players[mayor];
-		partida->players[mayor] = player;
-	}
-}
-
-
+/*Exporta a informaÁ„o de cada jogador aos dos ficheiros correspondentes*/
 void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	int i;
 	int n = strlen(player->name);
@@ -592,7 +393,7 @@ void infoprintPlayer(PLAYER *player,FILE *info,int nT,FILE *json){
 	fprintf(info,"|   %.1f   |\n",per*100);
 }
 
-
+/*Mostrar ficheiros de texto no programa para ter uma melhor apresentaÁ„o*/
 void fprintText(int n,char file[100],int a, FILE *info){
 	FILE *fp;
 	fp = fopen(file,"r");
@@ -608,6 +409,8 @@ void fprintText(int n,char file[100],int a, FILE *info){
 	fclose(fp);
 }
 
+/*Exporta a informaÁ„o da partida para dois ficheiros um .txt(mostrar em texto plano os resultados) 
+e um .json(cria uma base de datos para ser usada na pagina web)*/
 void informacao(PARTIDA *partida){
 	char name[100];
 	printf("What do you want to name the file containing game information? \n");
@@ -658,19 +461,8 @@ void informacao(PARTIDA *partida){
 	fclose(information);
 }
 
-void cesto(){
-	FILE *py;
-    py = popen("py", "w");
-    if (py == NULL) {
-        printf("Erro ao abrir pipe para o python.\n"
-            "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
-        exit(0);
-    }
-    fprintf(py, "exec(open('video.py').read())");
 
-    fclose(py);
-}
-
+/*Permite abandonar o jogo no meio da partida*/
 void exitGame(int v,PARTIDA *partida){
 	if(v == -10){
 		int x = mainSelect("leave");
@@ -683,6 +475,11 @@ void exitGame(int v,PARTIDA *partida){
 	}	
 }
 
+
+/***********************************************************FUN«OES QUE DECORREM O JOGO DA PARTIDA************************************************************/
+
+/*Nesta funÁ„o sao utilizadas funÁıes do ficheiro valoreslaunch.h (para inserir os valores respetivos a cada lanÁamento)
+e a funÁao launch.h (para fazer o lanÁamento de cada bola)*/
 void runRonda(PARTIDA *partida, int j,int i, int k){
 	system("cls");
 	printtext(partida->nPlaneta,"Ficheiros_de_texto/planetsVisual",16);
@@ -739,12 +536,15 @@ void runRonda(PARTIDA *partida, int j,int i, int k){
 			
 }
 
+/***********************************************************FUN«OES PYTHON************************************************************/
+
+/*Variavel auxiliar para controlo dos ficheiros de video de acordo a validade do cesto*/
 void cestoAux(PLAYER *player, int n){
 	FILE * file2;
 	file2=fopen("VIDEOS/.videos","w");
 	if(file2==NULL){
 		printf("nao abriu commands\n");
-		//exit(-1);
+		exit(-1);
 	}
 	if(n == 1)
 		fprintf(file2, "%s", player->name);
@@ -752,7 +552,101 @@ void cestoAux(PLAYER *player, int n){
 		fprintf(file2, "haha");
 	fclose(file2);
 }
+/*Abre e reproduz em segundo plano as funÁıes de python que mostram os videos*/
+void cesto(){
+	FILE *py;
+    py = popen("py", "w");
+    if (py == NULL) {
+        printf("Erro ao abrir pipe para o python.\n"
+            "Instale python, dependencia necesaria para o funcionamento completo do programa\n");
+        exit(0);
+    }
+    fprintf(py, "exec(open('video.py').read())");
 
+    fclose(py);
+}
+
+/***********************************************************FUN«OES QUE VERIFICAM O ESTADO DA PARTIDA************************************************************/
+
+/*Soma os ontos ao jogador de acordo a ronda e se apresenta o bonus, tudo isto em funÁ„o da zona*/
+void somaPontos(PLAYER * player,int n,int aux){	
+	switch(player->zona){
+		case 1:
+			if(aux==0)
+				player->pontosRondas[n]++;
+			
+			else if(aux==1)
+				player->pontosRondas[n]+=2;
+			
+			break;
+
+		case 2:
+			if(aux==0)
+				player->pontosRondas[n]+=2;
+			
+			else if(aux==1)
+				player->pontosRondas[n]+=3;
+			
+			break;	
+		case 3:
+			if(aux==0)
+				player->pontosRondas[n]+=3;
+				
+			else if(aux==1)
+				player->pontosRondas[n]+=4;
+		break;
+	}
+}
+
+/* Muda de posiÁ„o do jogador em funÁ„o ao modo de jogo, posiÁ„o atual e se foi ou nao cesto o lanÁamento 
+SE DISTORIGINAL PARA O CASE 3 JA FOR MAXIMO(DIAGONAL DO CAMPO) DEVE MANTER ESSA POSICAO      MAXIMO=SQRT(L/2^2+C^2)
+SE DISTORIGINAL PARA O CASE 4 JA FOR MINIMO(A 1 METRO DO CESTO) DEVE MANTER ESSA POSICAO      MINIMO=1*/
+void adaptaZona(PLAYER* player,CAMPO* campo, int n,int modo){                                                           ///////////////////////////////////////////////DIFERENCA
+	float distatual2=campo->ancho;
+	float distatual1=0.0;
+	float distoriginal=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+	float MAXIMO =sqrt(pow(campo->ancho,2)+pow(campo->largo/2,2));
+	
+	if(modo != SUDDEN_DEATH){
+		switch(n){
+
+			case 1:                                                        ///////////////////////ZONA MAIS LONGE- USADA PARA A QUANDO MARCA PONTO
+				gerarPosicoes(player,campo,player->zona+1);
+				player->zona++;
+			break;
+
+			case 2:                                            ///////////////////////ZONA MAIS PERTO- USADA PARA A QUANDO PERDE DUAS VEZES SEGUIDAS
+				gerarPosicoes(player,campo,player->zona-1);
+				player->zona--;
+			break;	
+
+			case 3: 
+			    gerarPosicoes(player,campo,player->zona);
+			    distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);                                  ///////////////////////MESMA ZONA MAS MAIS LONGE- USADA PARA QUANDO ESTA  NA ZONA 3 E ACERTA
+				if(!(distoriginal>=MAXIMO-MAXIMO*0.002)){
+					while (distatual1<=distoriginal ){           
+					gerarPosicoes(player,campo,player->zona); 
+					distatual1=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+					}
+				}   
+				break;	
+			
+			case 4:  
+				gerarPosicoes(player,campo,player->zona);  
+				distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);                                    ///////////////////////MESMA ZONA MAS MAIS PERTO- USADA PARA A ZONA 1
+				if(!(distoriginal<=MINIMO+0.1)){
+					while (distatual2>=distoriginal  && distatual2!=MINIMO){
+						gerarPosicoes(player,campo,player->zona);      
+						distatual2=distCesto(player->posX,player->posY,campo->largo,campo->ancho);
+					}
+				}
+				break;
+		}
+	}
+}
+
+/*Depois de ser executado o lanÁamento verifica se este foi cesto ou nao, para isto utiliza os valores antes ja calculados
+no lanÁamento (funÁoes de launch.h)*/
 int confirmRonda(PARTIDA *partida, int j,int i){
 	int aux = 1;
 
@@ -785,7 +679,6 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 			partida->players[j].bola.bonus = 0;
 			partida->players[j].f++;
 		}
-		
 	}
 	if(partida->settings.videos){
 		cesto();
@@ -799,21 +692,144 @@ int confirmRonda(PARTIDA *partida, int j,int i){
 	for(a=0; a<partida->njogadores; a++){
 		addJugador(partida->players[a].posX,partida->players[a].posY,'0'+a+1,&partida->campo);	
 	}
-	
-
-	
 	return aux;
 }
 
+/***********************************************************FUN«OES AUXILIARES************************************************************/
+/*Conta os pontos totais de um PLAYER*/
+void resultado(PLAYER *player){
+	int i;
+	int soma = 0;
+	for(i=0; i<player->numeroRondas; i++){
+		soma += player->pontosRondas[i];
+	}
+	player->total = soma;
+}
 
+/*Ordena aos jogadores do melhor ao menor em funÁ„o dos seus pontos*/
+void ordenar(PARTIDA *partida){
+	int i,j;
+	int mayor;
+	PLAYER player;
+	for(i=0; i<partida->njogadores; i++){
+		resultado(&partida->players[i]);
+	}
+
+	for(i=0; i<partida->njogadores; i++){
+		mayor = i;
+		for(j=i; j<partida->njogadores; j++){
+			if(partida->players[j].total>partida->players[i].total)
+				mayor = j;
+		}
+		player = partida->players[i];
+		partida->players[i] = partida->players[mayor];
+		partida->players[mayor] = player;
+	}
+}
+
+
+/*Inicializar a 0 a variavel auxiliar para detetar o numero de falhas para cada jogador*/
+void poeZeros(PARTIDA* partida){                                         
+	int i;
+	for(i=0;i<partida->njogadores;i++){
+		partida->players[i].f=0;
+		
+	}
+}
+
+/*Guarda os resultados de cada jogador num array dinamico para depois verificar se existe empate*/
+void SomaRondas (PARTIDA* partida,int* n){
+	int soma,i,j;
+	for(i=0;i<partida->njogadores;i++){
+		resultado(&partida->players[i]);
+		n[i]=partida->players[i].total;
+	}
+}
+
+/*Verifica se existem dois ou mais jogadores na primeira posiÁ„o, sendo verdade realoca memoria para continuar o jogo
+adicionando EXTREAS rondas e devolvendo um valor int[1,0]
+	1 = EMPATE
+	0 = NAO HA EMPATE
+alem disso guarda em dois pointers int
+	lastronda = o valor da ultima ronda para continuar apartir dai
+	np = o numero de jogadores empatados*/
+int VeRondas(PARTIDA* partida,int *lastronda, int *np,int extras)
+{
+	int res = 0;
+	(*np) = 0;
+	int i,j=1,m;
+	int* n=(int*) malloc(sizeof(int)*(partida->njogadores));            				/////array das somas dos pontos dos jogadores por ordem de como os proprios estao organizados
+	int* jogadoresprimeiro=(int*) malloc(sizeof(int));                 					 /////array que guarda os indices dos jogadores com maior pontua√ßao
+	jogadoresprimeiro[0]=0;
+
+	SomaRondas(partida,n);
+	int maior=n[0];
+	for(i=1;i<partida->njogadores;i++){
+		if(n[i]>maior){
+			maior=n[i];
+			j=1;
+			jogadoresprimeiro=(int*) realloc(jogadoresprimeiro,sizeof(int)*j);
+			jogadoresprimeiro[0]=i;
+		}
+		else if(n[i]==maior){
+			j++;
+			jogadoresprimeiro=(int*) realloc(jogadoresprimeiro,sizeof(int)*j);
+			jogadoresprimeiro[j-1]=i;
+		}
+	
+	}	
+	if(partida->modoDeJogo==COMPETITIVE && j>1){                                        				/////caso seja modo 2-adicionar rondas e temos varios jogadores com a maior pontua√ßao
+	
+		for(m=0;m<partida->njogadores;m++){
+			int aux = partida->players[m].numeroRondas;
+			(*lastronda) = aux;
+
+			partida->players[m].numeroRondas+=extras;             			//////aumento do numero de rondas usando o vetor jogadoresprimeiro porque guarda os indices dos jogadores que estejam nesta situacao
+			partida->players[m].pontosRondas=(int*) realloc(partida->players[m].pontosRondas,sizeof(int)*(partida->players[m].numeroRondas)); 
+			partida->players[m].fallos=(int*) realloc(partida->players[m].fallos,sizeof(int)*(partida->players[m].numeroRondas)); 
+			partida->players[m].cestos=(int*) realloc(partida->players[m].cestos,sizeof(int)*(partida->players[m].numeroRondas)); 
+			partida->players[m].tentativas=(int*) realloc(partida->players[m].tentativas,sizeof(int)*(partida->players[m].numeroRondas)); 
+			res = 1;
+			if(partida->players[m].pontosRondas == NULL || partida->players[m].fallos == NULL)
+					exit(-1);
+			int k;
+			for(k=0; k<extras; k++){
+				partida->players[m].pontosRondas[aux+k] = 0;
+				partida->players[m].fallos[aux+k] = 0;
+				partida->players[m].cestos[aux+k] = 0;
+				partida->players[m].tentativas[aux+k] = 0;
+			}
+		}
+	}
+	(*np) = j;
+	free(n);
+	free(jogadoresprimeiro);
+	if(res)			partida->nRondas+=extras;  
+	return res;
+}
+
+
+void freeMemoryPartida(PARTIDA *partida){
+	int i;
+	for(i=0; i < partida->njogadores; i++){
+		free(partida->players[i].name);
+		free(partida->players[i].pontosRondas);
+		free(partida->players[i].fallos);
+	}
+
+	free(partida->players);
+	freeCampo(&partida->campo);
+	free(partida);
+}
+
+/*ESTRUTURA para saber guardar a informaÁ„o do vencedor*/
 typedef struct VENCEDOR{
 	char nome[30];
 	int pontuacao;
 }VENCEDOR;
 
-
-
-
+/*Como extra se os jogadores envolvidos tiverem uma pontuaÁ„o > 0 verifica se bateu um recorde sendo assim guarda a informaÁ„o
+em dois ficheiros HIGHSCORES.data (base de datos) e higscores.json(para mostrar no site)*/
 void listaMelhores(PARTIDA* partida){
 	VENCEDOR * lista=NULL;
 	int contador;
@@ -895,44 +911,13 @@ void listaMelhores(PARTIDA* partida){
 	system("pause");
 }
 
-
-void poeZeros(PARTIDA* partida){                                         
-	int i;
-	for(i=0;i<partida->njogadores;i++){
-		partida->players[i].f=0;
-		
-	}
-}
-
-
+/***********************************************************FUN«AO PRINCIPAL ONDE DECORRE TODAS AS RONDAS************************************************************/
 void playGame(PARTIDA *partida){
 	int i,j,k;
 	int aux;
-	int last,nP,zona;
-	if(partida->modoDeJogo == SUDDEN_DEATH){
-		aux = 1;
-		k = 0;
-		poeZeros(partida);
-		while(aux){
-			i = 0;
-			if(k>0 && k%2 == 0){
-				zona=1+rand()%2; 
-				posRandomRonda(partida,zona);
-			}
-			for(j=0; j<partida->njogadores && aux;j++){
-				runRonda(partida,j,i,k);
-				aux = confirmRonda(partida,j,i);
-				partida->players[j].tentativas[i]++;
-				system("del obstaculo");
-				system("del parabola");
-				system("del cesto");
-				if(aux)
-					VeRondas(partida,&last,&nP,1);
-			}
-			k++;
-		}
-	}
-	else{
+	int last = 0,nP,zona;
+	if(partida->modoDeJogo != SUDDEN_DEATH){
+
 		for(i=0; i<partida->nRondas ; i++){
 			poeZeros(partida);
 			if(i>2){
@@ -976,6 +961,30 @@ void playGame(PARTIDA *partida){
 					}	
 				}
 			}
+		}
+		ordenar(partida);
+		if(VeRondas(partida,&last,&nP,1))
+			partida->modoDeJogo = SUDDEN_DEATH;
+	}
+	if(partida->modoDeJogo == SUDDEN_DEATH){
+		aux = 1;
+		k = 0;
+		poeZeros(partida);
+		while(aux){
+			i = last;
+			if(k>0 && k%2 == 0){
+				zona=1+rand()%2; 
+				posRandomRonda(partida,zona);
+			}
+			for(j=0; j<partida->njogadores && aux;j++){
+				runRonda(partida,j,i,k);
+				aux = confirmRonda(partida,j,i);
+				partida->players[j].tentativas[i]++;
+				system("del obstaculo");
+				system("del parabola");
+				system("del cesto");
+			}
+			k++;
 		}
 	}
 	
