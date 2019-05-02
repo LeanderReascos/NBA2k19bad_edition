@@ -7,7 +7,7 @@
 #include "settings.h"
 
 #define PI 3.14
-#define POSINICIO 3
+#define POSINICIO 1
 
 #define CASUAL 1
 #define COMPETITIVE 2
@@ -63,15 +63,15 @@ typedef struct planeta{
 /*Valores por default para o decorrer do jogo*/
 void setsDefault(PARTIDA *partida){
 	partida->settings.musica = true;
-	partida->settings.videos  = false;
-	partida->settings.animacion  = false;
-	partida->settings.gnuplot  = false;
-	partida->settings.velocidadeAnimacion = 3;
+	partida->settings.videos  = true;
+	partida->settings.animacion  = true;
+	partida->settings.gnuplot  = true;
+	partida->settings.velocidadeAnimacion = 1;
 	partida->settings.nR[0] = 3; //ronda casual
 	partida->settings.nR[1] = 3; //competitive
 	partida->settings.nR[2] = 1; //muerte subita
-	partida->settings.nT[0] = 3; //tentaitvas casual
-	partida->settings.nT[1] = 3; //tentativas competitive
+	partida->settings.nT[0] = 5; //tentaitvas casual
+	partida->settings.nT[1] = 5; //tentativas competitive
 	partida->settings.nT[2] = 1; //muerteSubita
 }
 /***********************************************************FUNÇOES PARA A CRIAÇÂO DA PARTIDA************************************************************/
