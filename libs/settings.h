@@ -99,7 +99,7 @@ void boleanMenu(int n,BOOL *set){
 	}
 	while(ans != 0);
 
-	if(n == 6)
+	if(n == 6 && !(*set))
 		Musica('s');
 }
 
